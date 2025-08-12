@@ -293,7 +293,7 @@ const SpatialClustering = {
             opacity: 0.8,
             visible: true
           }
-        }
+        } 
       });
 
       /**

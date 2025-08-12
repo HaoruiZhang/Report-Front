@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="./assets/common/favicon.png" rel="icon" type="image/png" />
-  <title>Summary</title>
+  <title>Analytical Report</title>
 </head>
 
 <body>
@@ -268,6 +268,20 @@
               </div>
             </div>
 
+            <!--
+            <cell-cluster-by-png v-if="dataJson.cellseg" :module-title="dataJson.cellseg.title"
+              :msg="dataJson.cellseg.msg" :data="dataJson.cellseg.data"
+              :base-src="(dataJson.clusterImage && dataJson.clusterImage.src.source) ?  dataJson.clusterImage.src : dataJson.baseImageList[0].src"
+              prefix="gene-cellbin">
+            </cell-cluster-by-png>
+          -->
+            <cell-cluster-by-point v-if="dataJson.cellseg" :module-title="dataJson.cellseg.title"
+              :msg="dataJson.cellseg.msg" :data="dataJson.cellseg.data"
+              :base-src="(dataJson.clusterImage && dataJson.clusterImage.src.source) ?  dataJson.clusterImage.src : dataJson.baseImageList[0].src"
+              prefix="gene-cellbin">
+            </cell-cluster-by-point>
+
+
             <div class="module-box cluster-module" id="geneCellbinCluster" style="width: 1200px;padding-bottom: 20px;">
               <module-header :module-title="dataJson.omics.gene.cellbin.clustering.title">
               </module-header>
@@ -376,7 +390,8 @@
               :data="dataJson.omics.protein.squarebin.statistics.data">
             </square-table>
 
-            <div id="proteinSquarebinDistribution" class="module-box distribution-module" style="width: 1200px;padding-bottom: 20px;">
+            <div id="proteinSquarebinDistribution" class="module-box distribution-module"
+              style="width: 1200px;padding-bottom: 20px;">
               <module-header module-title="Square Bin Plots" :msg="dataJson.omics.protein.squarebin.distribution.msg">
               </module-header>
               <div class="module-content-box binsize-container">
@@ -619,8 +634,8 @@
               </div>
             </div>
 
-            <command-line :module-title="dataJson.ms.commandLine.title"
-              :msg="dataJson.ms.commandLine.msg" :data="dataJson.ms.commandLine.data">
+            <command-line :module-title="dataJson.ms.commandLine.title" :msg="dataJson.ms.commandLine.msg"
+              :data="dataJson.ms.commandLine.data">
             </command-line>
           </div>
 
@@ -1798,7 +1813,9 @@
 
   /* Registration */
   .registration-module,
-  .spatialClustering-module {
+  .spatialClustering-module,
+  .cellSeg-module,
+  .cellCluster-content {
     .module-content-box {
       width: 100%;
       height: 640px;
@@ -1868,6 +1885,50 @@
 
         &:active {
           background-color: rgba(0, 0, 0, 0.72);
+        }
+      }
+
+      .el-switch {
+        --el-switch-on-color: #45537a;
+        /* background: var(--Light-B7-, #EBECF0); */
+
+        border-radius: 4px;
+        flex: 1;
+        text-align: center;
+        color: var(--Light-B2-, #45537A);
+
+        .el-radio-button__inner {
+          /* background: var(--Light-B7-, #EBECF0);
+          border: none;
+          width: 100%;
+          border-radius: 4px;
+          box-shadow: none;
+          padding: 7px 11px;
+          font-size: 14px;
+          line-height: 22px; */
+
+          &:hover {
+            color: var(--Light-B2-, #45537A);
+            background-color: rgba(0, 0, 0, 0.04);
+          }
+        }
+
+        &.is-active {
+          .el-radio-button__inner {
+            background-color: #ffffff;
+            border: none;
+            color: var(--Light-B2-, #45537A);
+            font-size: 14px;
+            font-style: normal;
+            font-weight: 600;
+
+
+
+            &:hover {
+              color: var(--Light-B2-, #45537A);
+            }
+          }
+
         }
       }
 
@@ -1945,6 +2006,14 @@
               line-height: normal;
             }
           }
+        }
+
+        .control-box {
+
+          width: 100%;
+          box-sizing: border-box;
+          margin-bottom: 12px;
+          position: relative;
         }
 
         .overview-box {
@@ -3190,6 +3259,8 @@
 <script src="./js/dependencies/FileSaver.min.js"></script>
 <!-- <script src="./js/Title.js"></script> -->
 <script src="./js/module/BatchCorrection.js"></script>
+<script src="./js/module/CellClusterByPng.js"></script>
+<script src="./js/module/CellClusterByPoint.js"></script>
 <script src="./js/module/Cluster.js"></script>
 <script src="./js/module/ClusterRatio.js"></script>
 <script src="./js/module/CommandLine.js"></script>
@@ -3239,6 +3310,8 @@
   const app = createApp({
     components: {
       BatchCorrection,
+      CellClusterByPng,
+      CellClusterByPoint,
       Cluster,
       ClusterRatio,
       CommandLine,
@@ -3325,7 +3398,7 @@
         msMarkerTableBinsize.value = resultJson.ms?.aggrMarkers?.binlist[0]?.value || 'Slice_01';
         proteinDistributionBinsize.value = resultJson.omics?.protein?.squarebin?.distribution?.binlist[0]?.value || 'bin20';
         proteinClusterBinsize.value = resultJson.omics?.protein?.squarebin?.clustering?.binlist[0]?.value || 'bin20';
-
+        document.title = resultJson?.reportTitle || 'Analytical Report';
 
         const toolTip = document.getElementById('distribution-hover-layer2');
         document.addEventListener('mousemove', function (event) {
