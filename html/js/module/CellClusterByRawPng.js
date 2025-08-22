@@ -1,5 +1,5 @@
 
-const CellClusterByPng = {
+const CellClusterByRawPng = {
 
   props: {
     msg: Array,
@@ -7,6 +7,8 @@ const CellClusterByPng = {
     prefix: String,
     moduleTitle: String,
     baseSrc: String,
+    containerId: String,
+    imageOffsetObj: Object
   },
   setup(props) {
     const { prefix } = props;
@@ -17,6 +19,7 @@ const CellClusterByPng = {
       cellSeg: { opacity: 0.8, show: true, indexStart: 1, length: 1 },
       cluster: { opacity: 0.8, show: true, indexStart: 5, length: 1 }
     });
+    const renderSrcArr = ref([]);
 
     const ifShowExplain = ref(false);
     const cellSegPrefix = prefix + '-spatial-cell';
@@ -135,9 +138,19 @@ const CellClusterByPng = {
       }
     };
 
-
+    function renderSummaryProteinExpression(eleId = props.containerId) {
+      console.log('render expression, id: ', eleId);
+      panzoomInstance = Panzoom(document.getElementById(eleId), {
+        minScale: 0.5,
+        maxScale: 16,
+        startX: props.imageOffsetObj.startX,
+        startY: props.imageOffsetObj.startY,
+        startScale: props.imageOffsetObj.startScale * 0.95,
+      });
+      document.getElementById(eleId).addEventListener('wheel', panzoomInstance.zoomWithWheel);
+    };
     onMounted(async () => {
-      console.log('CellClusterByPng Module mounted, props: ', props);
+      console.log('CellClusterByRawPng Module mounted, props: ', props);
       imageStateObj.value.cluster.length = props.data.clusters.length;
       formattedSeries.value = props.data.colorSet.map((item, index) => {
         return {
@@ -151,41 +164,53 @@ const CellClusterByPng = {
         }
       });
 
+      console.log('【OpenSeadragon】', OpenSeadragon);
+
+
+
       const workerCode = `
         self.onmessage = function(e) {
           const data = JSON.parse(e.data);
-          const images = [...data.cellseg, ...data.clusters.flat(1)];
-          /*const images = [...data.cellseg, ...data.clusters[0], ...data.clusters[1], ...data.clusters[2]];*/
-          self.postMessage(JSON.stringify(images));
+          const imagesSrcArr = [data[0],...data[1].cellseg, ...data[1].clusters.flat(1)].map(item=>item.source);
+          self.postMessage(JSON.stringify(imagesSrcArr));
         };
       `;
 
       const blob = new Blob([workerCode], { type: 'application/javascript' });
       const workerUrl = URL.createObjectURL(blob);
       const worker = new Worker(workerUrl);
-      worker.postMessage(JSON.stringify(props.data));
+      worker.postMessage(JSON.stringify([props.baseSrc, props.data]));
       worker.onmessage = function (e) {
-        const flattenImages = JSON.parse(e.data);
-        console.log('【【Main received data】】', flattenImages);
-        Plotly.newPlot(cellSegPrefix, [
-          {
-            "x": [6460, 11500],
-            "y": [6460, 20000],
-            "mode": "markers",
-            "name": "Cluster 1",
-            "type": "scattergl",
-            "hovertemplate": "",
-            "marker": {
-              "opacity": 0,
-              "symbol": "circle",
+        const renderSrcArr2 = JSON.parse(e.data);
+        OpenSeadragon({
+          id: props.containerId,
+          drawerOptions:{
+            
+          },
+          tileSources: renderSrcArr2.map((src, index) => {
+            return {
+              type: 'image',
+              url: src,
+              index: index,
+              buildPyramid: false,
+              renderers: {
+                type: 'webgl',
+                options: {
+                  preserveDrawingBuffer: true
+                }
+              }
+
             }
-          }], { ...layout, images: [props.baseSrc, ...flattenImages] }, config);
+          })
+        })
       };
+
     });
 
     return {
       props,
       prefix,
+      renderSrcArr,
       cellSegPrefix,
       ifShowExplain,
       formattedSeries,
@@ -212,8 +237,27 @@ const CellClusterByPng = {
     <div class="module-content-box" style="height:600px;">
 
       <div class="main-area" style="position: relative;width:767px;padding:20px;display: flex;">
-        <div :id="cellSegPrefix" style="width:0;flex:1;height:100%;"></div>
-        <div style="width: 98px;height: 100%; overflow:auto; margin-left: 12px;;overscroll-behavior:contain">
+        <!--<div :id="cellSegPrefix" style="width:0;flex:1;height:100%;"></div>-->
+
+
+
+        <div :id="props.containerId" style="position: relative;width: 0;flex:1;height: 100%; ">
+          <template v-for="(item, index) in renderSrcArr">
+            <img ref="imageRef" :src="item" style="width: auto;height: 100%;position:absolute;object-fit: contain;top:50%;left:50%;transform:translate(-50%, -50%);">
+          
+          </template>
+          
+        </div>
+
+
+
+
+
+
+
+
+
+        <div style="width: 98px;height: 100%; overflow:auto; margin-left: 12px;overscroll-behavior:contain">
           <div :id="cellSegPrefix + 'legend'">
             <template v-for="(item, index) in formattedSeries">
               <div class="legend-item" @dblclick.stop.prevent="toggleDblClick(item)" @click.stop.prevent="toggleClick(item)"
