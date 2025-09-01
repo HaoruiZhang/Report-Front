@@ -4,6 +4,7 @@ const InputTable = {
     moduleTitle: String,
     msg: Object,
     data: Array,
+    customKey: String
   },
   setup(props) {
     const { msg } = props;
@@ -72,13 +73,13 @@ const InputTable = {
           </template>
         </el-table-column>
 
-        <el-table-column prop="groupName" v-if="props.data[0].groupName" align="left" width="160">
+        <el-table-column prop="custom" v-if="props.data[0].custom" align="left" width="160">
           <template #header>
             <div class="header">
               <span class="label">
-                Group Name
+                {{ props.customKey }}
               </span>
-              <el-tooltip offset="8" popper-class="hover-msg-box" :content="msg.groupName" placement="right" :raw-content="true">
+              <el-tooltip offset="8" popper-class="hover-msg-box" :content="msg.custom" placement="right" :raw-content="true">
                 <div class="msg-icon-box">
                   <zhrWholeAsk />
                 </div>
