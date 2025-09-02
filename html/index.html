@@ -376,8 +376,7 @@
               :data="dataJson.omics.protein.squarebin.statistics.data">
             </square-table>
 
-            <div id="proteinSquarebinDistribution" class="module-box distribution-module"
-              style="width: 1200px;padding-bottom: 20px;">
+            <div id="proteinSquarebinDistribution" class="module-box distribution-module" style="width: 1200px;padding-bottom: 20px;">
               <module-header module-title="Square Bin Plots" :msg="dataJson.omics.protein.squarebin.distribution.msg">
               </module-header>
               <div class="module-content-box binsize-container">
@@ -553,7 +552,7 @@
             </common-double-col>
 
             <input-table v-if="dataJson.ms.inputInformation" :module-title="dataJson.ms.inputInformation.title"
-              :msg="dataJson.ms.inputInformation.msg" :data="dataJson.ms.inputInformation.data"
+              :msg="dataJson.ms.inputInformation.msg" :data="dataJson.ms.inputInformation.data" 
               :custom-key="dataJson.ms.inputInformation.customKey">
             </input-table>
 
@@ -621,8 +620,8 @@
               </div>
             </div>
 
-            <command-line :module-title="dataJson.ms.commandLine.title" :msg="dataJson.ms.commandLine.msg"
-              :data="dataJson.ms.commandLine.data">
+            <command-line :module-title="dataJson.ms.commandLine.title"
+              :msg="dataJson.ms.commandLine.msg" :data="dataJson.ms.commandLine.data">
             </command-line>
           </div>
 
