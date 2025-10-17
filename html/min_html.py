@@ -19,7 +19,7 @@ if len(sys.argv) > 1:
     infile = sys.argv[1]
 else:
     infile = 'index.html'
-outfile = 'StereoReport_v8.4.0_dev.html'
+outfile = 'StereoReport_v8.2.0_dev.html'
 
 def minify_html(html_string):
   # html_string = re.sub(r'\/\/.*', '', html_string) # 空格、换行
@@ -98,8 +98,6 @@ def main(html_path):
             if 'module' in src:
                 content = minify_html(content)
             if 'result.js' in src:
-                content = jsmin(content)
-            if 'result-ms.js' in src:
                 content = jsmin(content)
 
         # 替换script标签的内容为压缩后的JS文件内容

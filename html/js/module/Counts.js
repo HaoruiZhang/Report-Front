@@ -258,7 +258,7 @@ const Counts = {
     };
 
     function toggleSelect(itemsArr) {
-      console.log('_toggleSelect', itemsArr);
+      console.log('toggleSelect', itemsArr);
       const newSeries = [];
       formattedSeries.value.forEach((item, index) => {
         if (itemsArr.includes(item.name)) {

@@ -155,18 +155,18 @@ const Expression = {
 
     <div class="module-content-box" style="width: 100%;height: 634px;display: flex;justify-content: space-between;margin-bottom: 20px;">
   
-      <div id="expression-download-dom" style="width: 767px;height: 100%;border-radius:4px;background: var(--Light-B8-, #F4F5F6);padding: 20px 0;box-sizing: border-box;">
+      <div style="width: 767px;height: 100%;border-radius:4px;background: var(--Light-B8-, #F4F5F6);padding: 20px 0;box-sizing: border-box;">
         <div style="width: 100%; height: 560px; display: flex; justify-content:center;margin-bottom: 12px;align-items:flex-end;">
             <div :class="{'panzoom-box':true, 'blackBackground': isBlackBg}" style="width: 560px; height: 100%; position: relative;border-radius: 4px;margin-right: 0;">
 
               
-              <el-tooltip offset="8" popper-class="hover-msg-box" content="Autoscale" placement="top" :raw-content="true">
+              <el-tooltip offset="8" popper-class="hover-msg-box" content="Autoscale" placement="top">
                 <div class="btn-box reset" @click="reset()" style="position: absolute; right: 56px;top:10px; ">
                   <el-icon :size="24"><zhrPos /></el-icon>
                 </div>
               </el-tooltip> 
 
-              <el-tooltip offset="8" popper-class="hover-msg-box" content="Download plot as a png" placement="top" :raw-content="true">
+              <el-tooltip offset="8" popper-class="hover-msg-box" content="Download plot as a png" placement="top">
                 <div class="btn-box download" @click="downloadExp()" style="position: absolute; right: 16px;top:10px; ">
                   <el-icon :size="16"><zhrDownload /></el-icon>
                 </div>

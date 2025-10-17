@@ -4,14 +4,12 @@ const MarkerTable = {
     moduleTitle: String,
     msg: Array,
     data: Array,
-    prefix: String,
-    headers: Array,
+    prefix: String
   },
   setup(props) {
     const ifShowExplain = ref(false);
     const tableId = ref(props.prefix + '-marker-table');
     const tableContainerId = ref(props.prefix + '-table-container');
-
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" title="goodgood TODO" width="14" height="14" viewBox="0 0 15 14" fill="none">
   <path d="M7.50003 4.38059C6.79946 4.38059 6.19656 4.9686 6.19656 5.79352H4.99656C4.99656 4.36995 6.07439 3.18059 7.50003 3.18059C8.91555 3.18059 10.0035 4.38066 10.0035 5.79352C10.0035 7.04076 9.18859 7.74044 8.50503 8.31242V9.02698H7.30503V8.14907C7.30503 8.02913 7.33179 7.91699 7.37034 7.82322C7.40369 7.74211 7.4666 7.62435 7.58116 7.52575L7.65257 7.46103L7.66162 7.45345C8.42252 6.81643 8.8035 6.45016 8.8035 5.79352C8.8035 4.97931 8.19048 4.38059 7.50003 4.38059Z"/>
   <path d="M8.5678 9.9167H7.3678V11.1167H8.5678V9.9167Z"/>
@@ -25,8 +23,9 @@ const MarkerTable = {
       const childrenArr = Array.from(element.parentElement.children);
       return childrenArr.indexOf(element) < childrenArr.length / 2 ? 'left' : 'right';
     };
-    function reStyle(tableContainer, curTable) {
-      var rows = tableContainer.getElementsByTagName("tr");
+    function reStyle(id = 'myTable', curTable) {
+      console.log('reStyle', id, tableContainerId);
+      var rows = document.getElementById(id).getElementsByTagName("tr");
       for (var i = 2; i < rows.length; i++) {
         var cells = rows[i].getElementsByTagName("td");
         for (var j = 2; j < cells.length; j += 2) {
@@ -42,11 +41,10 @@ const MarkerTable = {
       /**
        * 给翻页的省略号添加样式
        */
-      console.log('tableContainer', tableContainer);
-      const allPages = tableContainer.querySelectorAll('.dt-paging-button.current');
+      const allPages = document.querySelectorAll('.dt-paging-button.current');
       if (allPages.length) {
-        let curpage = parseInt(allPages[allPages.length - 1].innerHTML.replace(',', ''));
-        const ellipsisBtns = tableContainer.querySelectorAll(".ellipsis");
+        let curpage = parseInt(allPages[allPages.length - 1].innerHTML);
+        const ellipsisBtns = document.getElementById(tableContainerId.value).querySelectorAll(".ellipsis");
         for (let i = 0; i < ellipsisBtns.length; i++) {
           const elBtn = ellipsisBtns[i];
           const elDIrcetion = getElementDirection(elBtn);
@@ -66,7 +64,7 @@ const MarkerTable = {
       /*
         检测是否为空，当为空时，添加一行表格，增加图标
       */
-      const emptyRow = tableContainer.querySelector('.dt-empty');
+      const emptyRow = document.querySelector('.dt-empty');
       if (!emptyRow) return;
       const emptyRowParent = emptyRow.parentElement;
       const iconRow = document.createElement('tr');
@@ -84,13 +82,13 @@ const MarkerTable = {
 </svg>`;
     };
 
-    onMounted(async () => {
-      console.log('Mount MarkerTable: ', props.prefix, props.headers);
+    onMounted(() => {
+      console.log('Mount MarkerTable: ', props.prefix);
       const clusterNums = props.data[0].length / 2 - 1;
 
       let clusterHeaderTemplate = '<th colspan="2" class="cluster-header">Marker</th>';
       for (let i = 0; i < clusterNums; i++) {
-        clusterHeaderTemplate += `<th colspan="2" class="cluster-header">${props.headers?.length ? props.headers[i] : ('Cluster' + (i + 1))}</th>`;
+        clusterHeaderTemplate += `<th colspan="2" class="cluster-header">Cluster${i + 1}</th>`;
       };
 
       let geneidHeaderTemplate = "<th class='geneid-header'>ID</th> <th class='geneid-header'>Name</th>";
@@ -135,12 +133,10 @@ const MarkerTable = {
           bottomEnd: null
         }
       });
-      const tableContainer = document.getElementById(tableContainerId.value);
       markerTable.on('draw.dt', function () {
-        reStyle(tableContainer, markerTable);
+        reStyle(tableId.value, markerTable);
       });
-      await nextTick();
-      reStyle(tableContainer, markerTable);
+      reStyle(tableId.value, markerTable);
 
       const pagingBox = document.createElement('div');
       const spanEle = document.createElement('span');
@@ -154,13 +150,10 @@ const MarkerTable = {
         const inputVal = e.target.value;
         markerTable.page(parseInt(inputVal) - 1).draw('page');
       });
+      const dtPaging = document.querySelectorAll('.dt-paging');
+      dtPaging[dtPaging.length - 1].parentNode.insertBefore(pagingBox, dtPaging[dtPaging.length - 1]);
 
-      const dtPaging = tableContainer.querySelector('.dt-paging');
-
-      dtPaging.parentNode.insertBefore(pagingBox, dtPaging);
-
-      const searchInput = tableContainer.getElementsByClassName('dt-input')[0];
-      console.log('searchInput', searchInput);
+      const searchInput = document.getElementById('dt-search-0');
       searchInput.addEventListener('focus', function () {
         this.parentElement.classList.add('highlight');
       });

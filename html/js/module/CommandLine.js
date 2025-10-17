@@ -36,10 +36,10 @@ const CommandLine = {
       <div class="title-box-left " @click="expandCode()">
         <span class="title-label">{{props.moduleTitle}}</span>
           <div style="height: 20px;width:40px;padding:5px 0;">
-            <el-tooltip offset="8" v-if="ifExpand" popper-class="hover-msg-box" content="Hide all commands" placement="top" :raw-content="true">
+            <el-tooltip offset="8" v-if="ifExpand" popper-class="hover-msg-box" content="Hide all commands" placement="top">
               <el-icon :size="20"><zhrCodeExpand /></el-icon>
             </el-tooltip>
-            <el-tooltip offset="8" v-else popper-class="hover-msg-box" content="Show all commands" placement="top" :raw-content="true">
+            <el-tooltip offset="8" v-else popper-class="hover-msg-box" content="Show all commands" placement="top">
               <el-icon :size="20"><zhrCode /></el-icon>
             </el-tooltip>
           </div> 

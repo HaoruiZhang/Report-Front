@@ -678,7 +678,7 @@ div.dt-container select.dt-input {
 div.dt-container .dt-paging .dt-paging-button {
   box-sizing: border-box;
   display: inline-block;
-  /* min-width: 1.5em; */
+  min-width: 1.5em;
   padding: 4px;
   margin-left: 2px;
   text-align: center;
