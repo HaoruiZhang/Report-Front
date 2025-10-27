@@ -22736,7 +22736,7 @@ return jQuery;
 		_numbers: _pagingNumbers,
 	
 		// Number of number buttons - legacy, use `numbers` option for paging feature
-		numbers_length: 8
+		numbers_length: 10
 	} );
 	
 	
