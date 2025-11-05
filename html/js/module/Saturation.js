@@ -9,13 +9,13 @@ const Saturation = {
     const ifShowExplain = ref(false);
     const plotboxStyle = ref(props.data.length == 2 ? "width:564px;height:487px;display:flex;" : "width:365px;height:487px;display:flex");
 
-    function formatter(value, gap = 0) {
-      if (value == 0){
+    function formatter(value, gap = 2) {
+      if (value <= 1000) {
         return value;
-      } else if (value > 0 && value <= 1) {
-        return value.toFixed(2);
-      } else if (value > 1 && value <= 1000) {
-        return value.toFixed(gap);
+        /** } else if (value > 0 && value <= 1) {
+          return value;
+        } else if (value > 1 && value <= 1000) {
+          return value; */
       } else if (value > 1000 && value <= 1000000) {
         return (value / 1000).toFixed(gap) + 'K';
       } else if (value > 1000000 && value <= 1000000000) {
@@ -90,7 +90,7 @@ const Saturation = {
             </div>
             
             <div style=" color:#45537A;font-weight: 500;font-size:12px;font-style: normal;">
-              <div>${param.dataIndex===0? 0.05: (param.dataIndex / 10).toFixed(2) }</div>
+              <div>${param.dataIndex === 0 ? 0.05 : (param.dataIndex / 10).toFixed(2)}</div>
               <div>${param.data[1]}</div>
             </div>
           </div>
