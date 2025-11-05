@@ -39,7 +39,7 @@ const CommonDoubleCol = {
             <div style="display: flex; align-items: center">
               <span style="margin-right: 4px">{{ scope.row.label }}</span>
               <el-tooltip :raw-content="true" offset="8" v-if="scope.row.msg"  popper-class="hover-msg-box" :content="scope.row.msg" placement="right">
-                <div class="msg-icon-box size14">
+                <div class="msg-icon-box  size14">
                   <zhrWholeAsk />
                 </div>
               </el-tooltip>

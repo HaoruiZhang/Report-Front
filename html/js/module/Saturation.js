@@ -14,9 +14,9 @@ const Saturation = {
         return value;
       } else if (value > 0 && value <= 1) {
         return value.toFixed(2);
-      } else if (value > 1 && value <= 100) {
+      } else if (value > 1 && value <= 1000) {
         return value.toFixed(gap);
-      } else if (value > 100 && value <= 1000000) {
+      } else if (value > 1000 && value <= 1000000) {
         return (value / 1000).toFixed(gap) + 'K';
       } else if (value > 1000000 && value <= 1000000000) {
         return (value / 1000000).toFixed(gap) + 'M';
