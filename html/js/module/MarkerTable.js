@@ -128,6 +128,11 @@ const MarkerTable = {
       const markerTable = new DataTable(`#${tableId.value}`, {
         "data": props.data,
         "scrollX": true,
+        "order": [[0, 'desc']], // 默认降序排序
+        "ordering": true, // 明确启用排序功能
+        "columnDefs": [
+          { "targets": "_all", "orderSequence": ["desc", "asc"] }
+        ],
         layout: {
           ...topTool,
           bottom: ['info', 'paging', 'pageLength'],
@@ -135,6 +140,7 @@ const MarkerTable = {
           bottomEnd: null
         }
       });
+
       const tableContainer = document.getElementById(tableContainerId.value);
       markerTable.on('draw.dt', function () {
         reStyle(tableContainer, markerTable);
