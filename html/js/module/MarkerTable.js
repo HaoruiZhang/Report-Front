@@ -127,8 +127,8 @@ const MarkerTable = {
       const markerTable = new DataTable(`#${tableId.value}`, {
         "data": props.data,
         "scrollX": true,
-        "order": [[3, 'asc'], [2, 'desc']], // 默认按第一个cluster的p-value升序排序，L2FC降序作为次序
-        "ordering": true, // 明确启用排序功能
+        "order": [[3, 'asc'], [2, 'desc']],  
+        "ordering": true,  
         "columnDefs": [
           { "targets": "_all", "orderSequence": ["desc", "asc"] }
         ],
@@ -140,10 +140,10 @@ const MarkerTable = {
         }
       });
       
-      // 联动排序：L2FC 和 p-value 列的联动
-      // L2FC 列索引: 2, 4, 6, ... (从第3列开始，每隔2列)
-      // p-value 列索引: 3, 5, 7, ... (从第4列开始，每隔2列)
-      let isCustomOrdering = false; // 防止递归触发
+      /* 联动排序：L2FC 和 p-value 列的联动
+       L2FC 列索引: 2, 4, 6, ... (从第3列开始，每隔2列)
+       p-value 列索引: 3, 5, 7, ... (从第4列开始，每隔2列)*/ 
+      let isCustomOrdering = false; 
       markerTable.on('order.dt', function () {
         if (isCustomOrdering) return;
         
@@ -154,28 +154,28 @@ const MarkerTable = {
         const colIndex = primarySort[0];
         const sortDir = primarySort[1];
         
-        // 跳过 ID(0) 和 Name(1) 列
+        /* 跳过 ID(0) 和 Name(1) 列 */
         if (colIndex < 2) return;
         
-        // 判断是 L2FC 列还是 p-value 列
-        // L2FC 列: (colIndex - 2) % 2 === 0
-        // p-value 列: (colIndex - 2) % 2 === 1
+        /* 判断是 L2FC 列还是 p-value 列 
+         L2FC 列: (colIndex - 2) % 2 === 0
+         p-value 列: (colIndex - 2) % 2 === 1*/ 
         const isL2FC = (colIndex - 2) % 2 === 0;
         const isPValue = (colIndex - 2) % 2 === 1;
         
         let newOrder = [];
         
         if (isL2FC) {
-          // 点击 L2FC 排序时，p-value 始终升序
+          /* 点击 L2FC 排序时，p-value 始终升序 */
           const pvalueColIndex = colIndex + 1;
           newOrder = [[colIndex, sortDir], [pvalueColIndex, 'asc']];
         } else if (isPValue) {
-          // 点击 p-value 排序时，L2FC 始终降序
+          /* 点击 p-value 排序时，L2FC 始终降序 */
           const l2fcColIndex = colIndex - 1;
           newOrder = [[colIndex, sortDir], [l2fcColIndex, 'desc']];
         }
         
-        // 检查是否需要更新排序
+        /* 检查是否需要更新排序 */
         if (newOrder.length > 0 && (currentOrder.length !== 2 ||
             currentOrder[0][0] !== newOrder[0][0] ||
             currentOrder[0][1] !== newOrder[0][1] ||
@@ -223,10 +223,10 @@ const MarkerTable = {
       /**
        * 给翻页和条数增加父元素
  
-var child = document.getElementById("child");//  获取子元素
-var parent = document.createElement('parent');//  新建父元素
+var child = document.getElementById("child"); 
+var parent = document.createElement('parent'); 
 parent.className = 'parent';
-child.parentNode.replaceChild(parent,child);//  获取子元素原来的父元素并将新父元素代替子元素
+child.parentNode.replaceChild(parent,child);  获取子元素原来的父元素并将新父元素代替子元素
 parent.appendChild(child);
        */
       /* TODO: 样式冲突
