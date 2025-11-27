@@ -10,13 +10,12 @@ const Expression = {
   },
   setup(props) {
     const { heatmapImageObj, baseImageList, containerId, moduleTitle, imageOffsetObj } = props;
-    const ifShowTissueBinsLayer = ref(true);
     const heatmapImageRef = ref();
     const imageRef = ref();
     const ifShowExplain = ref(false);
     const heatmapOpacity = ref(80);
     const ifEnhanceImage = ref(false);
-    const heatmapLayer = ref('tissuebins');
+    const binsRange = ref('tissuebins');
     const isBlackBg = ref(false);
     let panzoomInstance;
     let imageOpacity = 0.2;
@@ -56,16 +55,6 @@ const Expression = {
     };
 
 
-    watch(() => ifShowTissueBinsLayer.value, (nv, ov) => {
-      if (nv) {
-        currentHeatmapImageSrc.value = heatmapImageObj.tissueBins;
-        currentColorBar.value = heatmapImageObj.tissueBinsColorBar;
-      } else {
-        currentHeatmapImageSrc.value = heatmapImageObj.allBins;
-        currentColorBar.value = heatmapImageObj.allBinsColorBar;
-      };
-    });
-
     const changeHeatmapOpacity = (val) => {
       console.log(val);
       if (val < 0) {
@@ -84,16 +73,43 @@ const Expression = {
       if (imageRef.value?.style?.opacity) imageRef.value.style.opacity = imageOpacity;
     };
 
-    const changeHeatmapLayer = () => {
-      console.log('---- heatmapLayer', heatmapLayer.value);
-      if (heatmapLayer.value === 'allbins') {
-        currentHeatmapImageSrc.value = heatmapImageObj.allBins;
-        currentColorBar.value = heatmapImageObj.allBinsColorBar;
+    const colorSchemeList = [
+      { label: 'Viridis', value: 'Viridis', background: 'linear-gradient(90deg, #440154 0%, #35B779 50%, #FDE725 100%)', tag: '' },
+      { label: 'Turbo', value: 'Turbo', background: 'linear-gradient(90deg, #30123B 0%, #28BBEC 10%, #A2FC3C 25%, #F2F42B 40%, #FABA32 55%, #E85B1A 70%, #900C00 100%)', tag: '' },
+      { label: 'Rocket', value: 'Rocket', background: 'linear-gradient(90deg, #FBF4E0 0%, #E3594A 50%, #03051A 100%)', tag: '' },
+      { label: 'Blues', value: 'Blues', background: 'linear-gradient(90deg, #F7FBFF 0%, #08306B 100%)', tag: '' },
+      { label: 'Binary', value: 'Binary', background: 'linear-gradient(90deg, #FFFFFF 0%, #000000 100%)', tag: '' },
+    ];
+    const selectedColorScheme = ref('Viridis');
+    const filteredColorSchemeList = computed(() => {
+      const heatmapImageKeys = Object.keys(heatmapImageObj);
+      return colorSchemeList.filter(item => {
+        return heatmapImageKeys.includes(item.value);
+      });
+    });
+
+    const updateHeatmap = () => {
+      const data = heatmapImageObj[selectedColorScheme.value];
+
+      if (binsRange.value === 'allbins') {
+        currentHeatmapImageSrc.value = data.allBins;
+        currentColorBar.value = data.allBinsColorBar;
       } else {
-        currentHeatmapImageSrc.value = heatmapImageObj.tissueBins;
-        currentColorBar.value = heatmapImageObj.tissueBinsColorBar;
+        currentHeatmapImageSrc.value = data.tissueBins;
+        currentColorBar.value = data.tissueBinsColorBar;
       }
+
     };
+
+    const changeHeatmapLayer = () => {
+      console.log('---- binsRange', binsRange.value);
+      updateHeatmap();
+    };
+
+    const changeColorScheme = () => {
+      updateHeatmap();
+    };
+
     const changeBaseImageSrc = async (newValue) => {
       console.log('changeBaseImageSrc: ', newValue);
       baseImageList.forEach(item => {
@@ -101,6 +117,15 @@ const Expression = {
           currentBaseImageSrc.value = item.src.source;
         };
       });
+
+      const lowerVal = newValue.toLowerCase();
+      if (lowerVal.includes('he')) {
+        selectedColorScheme.value = 'Rocket';
+      } else if (['ssdna', 'dapi'].some(t => lowerVal.includes(t))) {
+        selectedColorScheme.value = 'Viridis';
+      }
+      updateHeatmap();
+
       await nextTick();
       if (imageRef.value?.style?.opacity) imageRef.value.style.opacity = imageOpacity;
     };
@@ -109,16 +134,23 @@ const Expression = {
       renderSummaryProteinExpression(containerId);
       isBlackBg.value = baseImageList.some(item => {
         return ['ssdna', 'dapi'].includes(item.value.toLowerCase())
-      })
+      });
+      const lowerVal = selectedImage.value.toLowerCase();
+      if (lowerVal.includes('he')) {
+        selectedColorScheme.value = 'Rocket';
+      } else if (['ssdna', 'dapi'].some(t => lowerVal.includes(t))) {
+        selectedColorScheme.value = 'Viridis';
+      }
+      updateHeatmap();
+      console.log('filteredColorSchemeList', filteredColorSchemeList.value);
     });
 
     return {
       props,
       containerId,
       isBlackBg,
-      ifShowTissueBinsLayer,
       changeHeatmapLayer,
-      heatmapLayer,
+      binsRange,
       selectedImage,
       heatmapImageRef,
       imageRef,
@@ -132,7 +164,11 @@ const Expression = {
       baseImageList,
       currentHeatmapImageSrc,
       currentBaseImageSrc,
-      currentColorBar
+      currentColorBar,
+      selectedColorScheme,
+      changeColorScheme,
+      colorSchemeList,
+      filteredColorSchemeList
     };
   },
   template: `
@@ -196,7 +232,7 @@ line-height: 22px; " >
 
       <div style="width: 368px;height: 100%;background: var(--Light-B8-, #F4F5F6);padding: 20px;box-sizing: border-box; border-radius: 4px; color: rgba(69, 83, 122, 1);">
          
-          <el-radio-group v-model="heatmapLayer" class="heatmap-btns-group" size="small" @change="changeHeatmapLayer">
+          <el-radio-group v-model="binsRange" class="heatmap-btns-group" size="small" @change="changeHeatmapLayer">
             <el-radio-button label="All Bins" value="allbins" />
             <el-radio-button label="Bins Under Tissue" value="tissuebins" />
           </el-radio-group>
@@ -212,6 +248,31 @@ line-height: 22px; " >
               </span>
             </el-option>
           </el-select>
+
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; height: 36px;">
+            <span style="color: #45537A; font-size: 14px;">Color Scheme</span>
+            <el-select v-model="selectedColorScheme" popper-class="expression-select-option" :show-arrow="true" placeholder="Select" style="width: 216px;" @change="changeColorScheme">
+              <template #prefix>
+                <div style="display: flex; align-items: center; height: 100%;">
+                  <div :style="{background: filteredColorSchemeList.find(i=>i.value===selectedColorScheme)?.background}" style="width: 60px; height: 20px; border-radius: 2px;"></div>
+                </div>
+              </template>
+              <el-option v-for="item in filteredColorSchemeList" :key="item.value" :label="item.label" :value="item.value">
+                <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                  <div style="display: flex; align-items: center;">
+                    <div :style="{background: item.background}" style="width: 60px; height: 20px; border-radius: 2px; margin-right: 8px;"></div>
+                    <span>{{ item.label }}</span>
+                  </div>
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <span v-if="item.tag" style="color: #E4007F; font-size: 12px;">{{ item.tag }}</span>
+                    <span v-if="selectedColorScheme===item.value" style="color: var(--el-text-color-secondary); font-size: 13px;">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="15" height="12" viewBox="0 0 15 12" fill="none"> <path fill-rule="evenodd" clip-rule="evenodd" d="M14.1297 1.95285L5.69385 11.1233L0.871094 5.51935L2.08383 4.47567L5.73366 8.71672L12.9521 0.869629L14.1297 1.95285Z" fill="#5F0085"/></svg>
+                    </span>
+                  </div>
+                </div>
+              </el-option>
+            </el-select>
+          </div>
 
          <el-slider v-model="heatmapOpacity" :show-tooltip="false" :min='-2' :max=102 @input="value=>changeHeatmapOpacity(value)">
          </el-slider>
