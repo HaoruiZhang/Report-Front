@@ -576,7 +576,8 @@
             </common-double-col>
 
             <input-table v-if="dataJson.ms.inputInformation" :module-title="dataJson.ms.inputInformation.title"
-              :msg="dataJson.ms.inputInformation.msg" :data="dataJson.ms.inputInformation.data">
+              :msg="dataJson.ms.inputInformation.msg" :data="dataJson.ms.inputInformation.data"
+              :custom-key="dataJson.ms.inputInformation.customKey">
             </input-table>
 
             <depth-normalization v-if="dataJson.ms.depthNormalization"
@@ -595,7 +596,8 @@
               :msg="dataJson.ms.clusterRatio.msg" :data="dataJson.ms.clusterRatio.data">
             </cluster-ratio>
 
-            <div class="module-box marker-table cellbin" style="width: 1200px;padding-bottom: 20px;">
+            <div v-if="dataJson.ms.markers" class="module-box marker-table cellbin"
+              style="width: 1200px;padding-bottom: 20px;">
               <module-header :module-title="dataJson.ms.markers.title" :msg="dataJson.ms.markers.msg.header">
               </module-header>
               <div class="module-content-box binsize-container">
@@ -605,7 +607,8 @@
               </div>
             </div>
 
-            <div class="module-box marker-table" style="width: 1200px;padding-bottom: 20px;">
+            <div v-if="dataJson.ms.aggrMarkers" class="module-box marker-table"
+              style="width: 1200px;padding-bottom: 20px;">
               <module-header :module-title="dataJson.ms.aggrMarkers.title" :msg="dataJson.ms.aggrMarkers.msg.header">
               </module-header>
               <div class="module-content-box binsize-container">
@@ -643,8 +646,8 @@
               </div>
             </div>
 
-            <command-line :module-title="dataJson.ms.commandLine.title" :msg="dataJson.ms.commandLine.msg"
-              :data="dataJson.ms.commandLine.data">
+            <command-line v-if="dataJson.ms.commandLine" :module-title="dataJson.ms.commandLine.title"
+              :msg="dataJson.ms.commandLine.msg" :data="dataJson.ms.commandLine.data">
             </command-line>
           </div>
 
@@ -3298,7 +3301,7 @@
 <script src="./js/module/Sunburst.js"></script>
 <script src="./js/module/TissueSeg.js"></script>
 <!--  End-->
-<script src="./js/result-cellseg.js"></script>
+<script src="./js/result.js"></script>
 <script src='./js/dependencies/panzoom-4.5.1.min.js'></script>
 <script src="./js/dependencies/plot.min.js"></script>
 <!-- <script>
