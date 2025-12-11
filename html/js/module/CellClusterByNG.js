@@ -66,14 +66,50 @@ const CellClusterByNG = {
       updateStyle();
     };
 
+    /** 
+     * 更新单个 cluster 的显示状态
+     * 通过修改颜色来控制可见性：visible=true 时显示原色，visible=false 时设为黑色（shader会丢弃）
+     */
     function updateStyle() {
-      const visibleList = formattedSeries.value.map(item => item.itemStyle.visible);
-      const indexList = formattedSeries.value.map(item => item.index);
-      Plotly.restyle(cellSegPrefix, {
-        visible: visibleList,
-      },
-        indexList
-      );
+      /** 更新 CellSeg 图层（轮廓）的各个 cluster 颜色 */
+      if (cellSegLayerManager && cellSegLayerManager.setClusterColor) {
+        formattedSeries.value.forEach((item, index) => {
+          const clusterId = index + 1; /** cluster ID 从 1 开始 */
+          const rgb = props.data.ngColorRgb[index];
+          if (item.itemStyle.visible) {
+            /* 显示：使用原始颜色*/
+            cellSegLayerManager.setClusterColor(clusterId, [rgb[0], rgb[1], rgb[2]]);
+          } else {
+            /* 隐藏：设置为透明色（RGB=0会让shader丢弃）*/
+            cellSegLayerManager.setClusterColor(clusterId, [0, 0, 0]);
+          }
+        });
+        /* 触发重绘*/
+        if (cellSegLayerManager.engineManager && cellSegLayerManager.engineManager.scheduleRedraw) {
+          cellSegLayerManager.engineManager.scheduleRedraw();
+        }
+        console.log('✅ CellSeg 图层各 cluster 颜色已更新');
+      }
+
+      /** 更新 Cluster 图层（填充）的各个 cluster 颜色 */
+      if (clusterLayerManager && clusterLayerManager.setClusterColor) {
+        formattedSeries.value.forEach((item, index) => {
+          const clusterId = index + 1; /* cluster ID 从 1 开始*/
+          const rgb = props.data.ngColorRgb[index];
+          if (item.itemStyle.visible) {
+            /* 显示：使用原始颜色*/
+            clusterLayerManager.setClusterColor(clusterId, [rgb[0], rgb[1], rgb[2]]);
+          } else {
+            /* 隐藏：设置为透明色（RGB=0会让shader丢弃）*/
+            clusterLayerManager.setClusterColor(clusterId, [0, 0, 0]);
+          }
+        });
+        /* 触发重绘*/
+        if (clusterLayerManager.engineManager && clusterLayerManager.engineManager.scheduleRedraw) {
+          clusterLayerManager.engineManager.scheduleRedraw();
+        }
+        console.log('✅ Cluster 图层各 cluster 颜色已更新');
+      }
     };
 
 
@@ -109,7 +145,7 @@ const CellClusterByNG = {
 
       const isVisible = imageStateObj.value.cluster.show;
 
-      /** 设置图层可见性 */ 
+      /** 设置图层可见性 */
       if (clusterLayerManager.setRenderLayerVisible) {
         clusterLayerManager.setRenderLayerVisible(isVisible);
       } else if (clusterLayerManager.managedUserLayer) {
