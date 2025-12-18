@@ -1,4 +1,5 @@
-const Cluster = {
+
+const CellCluster = {
 
   props: {
     msg: Array,
@@ -7,6 +8,7 @@ const Cluster = {
     binSize: String,
     baseSrc: String,
     baseImageList: Array,
+    cellSegSrc: Array
   },
   setup(props) {
     const { prefix, baseImageList } = props;
@@ -17,8 +19,8 @@ const Cluster = {
     });
     const spatialOpacity = ref(0.8);
     const ifShowExplain = ref(false);
-    const spatialPrefix = prefix + '-spatial';
-    const umapPrefix = prefix + '-umap';
+    const spatialPrefix = prefix + '-spatial-cell';
+    const umapPrefix = prefix + '-umap-cell';
     const layout = {
       yaxis: { autorange: 'reversed', scaleanchor: "x", scaleratio: 1, showgrid: false, showticklabels: false, zeroline: false },
       xaxis: { showgrid: false, showticklabels: false, zeroline: false },
@@ -33,7 +35,7 @@ const Cluster = {
     };
 
     const config = {
-      scrollZoom: false,
+      scrollZoom: true,
       displaylogo: false,
       displayModeBar: false,
       toImageButtonOptions: {
@@ -103,8 +105,19 @@ const Cluster = {
       );
     };
 
+
+
+    let xSize, ySize, makerSize;
+
+    function initScale(graphDiv) {
+      xSize = graphDiv.layout.xaxis.range[1] - graphDiv.layout.xaxis.range[0];
+      ySize = graphDiv.layout.yaxis.range[0] - graphDiv.layout.yaxis.range[1];
+      makerSize = graphDiv.data[0].marker.size;
+      console.log('xSize', xSize, 'ySize', ySize, 'makerSize', makerSize)
+    };
+
     onMounted(async () => {
-      console.log('Cluster Module mounted, props: ', props);
+      console.log('CellCluster Module mounted, props: ', props);
       formattedSeries.value[0] = props.data.spatial.map((item, index) => {
         return {
           index: index,
@@ -128,10 +141,31 @@ const Cluster = {
         }
       });
       console.log('formattedSeries', formattedSeries.value);
-      Plotly.newPlot(spatialPrefix, props.data.spatial, { ...layout, images: [props.baseSrc] }, config);
+      Plotly.newPlot(spatialPrefix, props.data.spatial, { ...layout, images: [props.baseSrc, ...props.cellSegSrc] }, config);
       Plotly.newPlot(umapPrefix, props.data.umap, layout, config);
       await nextTick();
       changeSpatialImageOpacity(spatialPrefix, 0.8);
+
+      const Size = props.data.spatial[0].marker.size;
+      const graphDiv = document.getElementById(spatialPrefix);
+      initScale(graphDiv);
+      graphDiv.on('plotly_relayout',
+        function (eventdata) {
+          var xChange = 1;
+          var yChange = 1;
+          if (ySize && eventdata['yaxis.range[0]'] && eventdata['yaxis.range[1]']) {
+            xSize1 = eventdata['xaxis.range[1]'] - eventdata['xaxis.range[0]'];
+            ySize1 = eventdata['yaxis.range[0]'] - eventdata['yaxis.range[1]'];
+            xChange = xSize / xSize1;
+            yChange = ySize1 / ySize;
+            makerSize = makerSize / yChange;
+            var update = { 'marker.size': makerSize };
+            console.log(graphDiv.data[0].marker.size)
+            Plotly.update(spatialPrefix, update);
+            xSize = eventdata['xaxis.range[1]'] - eventdata['xaxis.range[0]'];
+            ySize = eventdata['yaxis.range[0]'] - eventdata['yaxis.range[1]'];
+          }
+        });
     });
 
     return {
@@ -180,7 +214,7 @@ const Cluster = {
         </el-slider>
         <div class="buttons" style="margin-top: 4px;">
           <el-button height="36px" class="tissue-btn" @click="changeSpatialImageOpacity(spatialPrefix, 0)">Image</el-button>
-          <el-button class="tissue-btn" @click="changeSpatialImageOpacity(spatialPrefix,1)">Cluster</el-button>
+          <el-button class="tissue-btn" @click="changeSpatialImageOpacity(spatialPrefix,1)">CellCluster</el-button>
         </div>
       </div>
     </div>

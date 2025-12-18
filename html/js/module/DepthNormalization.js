@@ -100,13 +100,13 @@ const DepthNormalization = {
             </template>
           </el-table-column>
  
-          <el-table-column prop="meanMappedReadsBefroe" align="right" width="180">
+          <el-table-column prop="meanMappedReadsBefore" align="right" width="180">
             <template #header>
               <div class="header">
                 <span class="label second" style="width:120px;">
                   Mean Mapped Reads/Spots
                 </span>
-                <el-tooltip offset="8" popper-class="hover-msg-box" :content="msg.meanMappedReadsBefroe" placement="right" :raw-content="true">
+                <el-tooltip offset="8" popper-class="hover-msg-box" :content="msg.meanMappedReadsBefore" placement="right" :raw-content="true">
                   <div class="msg-icon-box">
                     <zhrWholeAsk />
                   </div>

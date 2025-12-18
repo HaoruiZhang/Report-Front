@@ -9,7 +9,7 @@ import sys
 import base64
 import io
 from PIL import Image
-
+print("PIL imported")
 from bs4 import BeautifulSoup
 sys.path.append("c:\\users\\zhanghaorui\\appdata\\local\\programs\\python\\python38\\lib\\site-packages") 
 from csscompressor import compress
@@ -20,7 +20,7 @@ if len(sys.argv) > 1:
 else:
     infile = 'index.html'
 outfile = 'StereoReport_v8.4.0_dev.html'
-
+print(f'Input file: {infile}, Output file: {outfile}')
 def minify_html(html_string):
   # html_string = re.sub(r'\/\/.*', '', html_string) # 空格、换行
   html_string = re.sub(r'\s+', ' ', html_string) # 空格、换行
@@ -70,6 +70,7 @@ def image_to_base64(image_path):
   
 def main(html_path):
     # 读取HTML文件
+    print(f'Processing file: {html_path}')
     with open(html_path, 'r', encoding = 'utf-8') as file:
         html_content = file.read()
     html_content = minify_html(html_content)
