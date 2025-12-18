@@ -18,6 +18,13 @@ const CellClusterByNG = {
     const ngStatus = ref('初始化中...');
     const ifShowExplain = ref(false);
     const cellSegPrefix = prefix + '-cellseg';
+
+    /** 保存图层管理器的引用 */
+    let imageLayerManager = null;
+    /** cellSeg 图层管理器（专门用于轮廓） */
+    let cellSegLayerManager = null;
+    /** cluster 图层管理器（专门用于填充） */
+    let clusterLayerManager = null;
     /**
      * function getClusterIndex(rawIndex) {
           const headIndex = rawIndex * 4 + 5;
@@ -59,40 +66,151 @@ const CellClusterByNG = {
       updateStyle();
     };
 
+    /** 
+     * 更新单个 cluster 的显示状态
+     * 通过修改颜色来控制可见性：visible=true 时显示原色，visible=false 时设为黑色（shader会丢弃）
+     */
     function updateStyle() {
-      const visibleList = formattedSeries.value.map(item => item.itemStyle.visible);
-      const indexList = formattedSeries.value.map(item => item.index);
-      Plotly.restyle(cellSegPrefix, {
-        visible: visibleList,
-      },
-        indexList
-      );
+      /** 更新 CellSeg 图层（轮廓）的各个 cluster 颜色 */
+      if (cellSegLayerManager && cellSegLayerManager.setClusterColor) {
+        formattedSeries.value.forEach((item, index) => {
+          const clusterId = index + 1; /** cluster ID 从 1 开始 */
+          const rgb = props.data.ngColorRgb[index];
+          if (item.itemStyle.visible) {
+            /* 显示：使用原始颜色*/
+            cellSegLayerManager.setClusterColor(clusterId, [rgb[0], rgb[1], rgb[2]]);
+          } else {
+            /* 隐藏：设置为透明色（RGB=0会让shader丢弃）*/
+            cellSegLayerManager.setClusterColor(clusterId, [0, 0, 0]);
+          }
+        });
+        /* 触发重绘*/
+        if (cellSegLayerManager.engineManager && cellSegLayerManager.engineManager.scheduleRedraw) {
+          cellSegLayerManager.engineManager.scheduleRedraw();
+        }
+        console.log('✅ CellSeg 图层各 cluster 颜色已更新');
+      }
+
+      /** 更新 Cluster 图层（填充）的各个 cluster 颜色 */
+      if (clusterLayerManager && clusterLayerManager.setClusterColor) {
+        formattedSeries.value.forEach((item, index) => {
+          const clusterId = index + 1; /* cluster ID 从 1 开始*/
+          const rgb = props.data.ngColorRgb[index];
+          if (item.itemStyle.visible) {
+            /* 显示：使用原始颜色*/
+            clusterLayerManager.setClusterColor(clusterId, [rgb[0], rgb[1], rgb[2]]);
+          } else {
+            /* 隐藏：设置为透明色（RGB=0会让shader丢弃）*/
+            clusterLayerManager.setClusterColor(clusterId, [0, 0, 0]);
+          }
+        });
+        /* 触发重绘*/
+        if (clusterLayerManager.engineManager && clusterLayerManager.engineManager.scheduleRedraw) {
+          clusterLayerManager.engineManager.scheduleRedraw();
+        }
+        console.log('✅ Cluster 图层各 cluster 颜色已更新');
+      }
     };
 
+
+    /** 
+     * 更新 CellSeg（轮廓）图层的可见性
+     */
+    function updateCellSegLayerVisibility() {
+      if (!cellSegLayerManager) {
+        console.warn('⚠️ CellSeg 图层管理器未初始化');
+        return;
+      }
+
+      const isVisible = imageStateObj.value.cellSeg.show;
+
+      /**设置图层可见性 */
+      if (cellSegLayerManager.setRenderLayerVisible) {
+        cellSegLayerManager.setRenderLayerVisible(isVisible);
+      } else if (cellSegLayerManager.managedUserLayer) {
+        cellSegLayerManager.managedUserLayer.visible = isVisible;
+      }
+
+      console.log('✅ CellSeg（轮廓）图层可见性已更新:', isVisible);
+    }
+
+    /** 
+     * 更新 Cluster（填充）图层的可见性
+     */
+    function updateClusterLayerVisibility() {
+      if (!clusterLayerManager) {
+        console.warn('⚠️ Cluster 图层管理器未初始化');
+        return;
+      }
+
+      const isVisible = imageStateObj.value.cluster.show;
+
+      /** 设置图层可见性 */
+      if (clusterLayerManager.setRenderLayerVisible) {
+        clusterLayerManager.setRenderLayerVisible(isVisible);
+      } else if (clusterLayerManager.managedUserLayer) {
+        clusterLayerManager.managedUserLayer.visible = isVisible;
+      }
+
+      console.log('✅ Cluster（填充）图层可见性已更新:', isVisible);
+    }
 
     function changeShowState(imageType, domId = cellSegPrefix) {
       console.log('_changeShowState', domId, imageType, imageStateObj.value[imageType]);
       const targetImage = imageStateObj.value[imageType];
-      let renderOpacity = targetImage.show ? targetImage.opacity : 0;
+      let renderOpacity = targetImage.opacity;
       if (renderOpacity > 1) renderOpacity = 1;
       if (renderOpacity < 0) renderOpacity = 0;
+      const isVisible = targetImage.show;
+
       switch (imageType) {
         case 'tissueSeg':
-          Plotly.relayout(domId, {
-            'images[0].opacity': renderOpacity
-          });
-          break;
-        case 'cellSeg':
-          var relayoutObj = {};
-          for (let i = targetImage.indexStart; i < targetImage.indexStart + targetImage.length * 4; i++) {
-            relayoutObj[`images[${i}].opacity`] = renderOpacity;
+          /** 控制 Tissue 图层（图像图层/底图）- 完全独立 */
+          if (imageLayerManager) {
+            /** 设置可见性 */
+            if (imageLayerManager.setRenderLayerVisible) {
+              imageLayerManager.setRenderLayerVisible(isVisible);
+            } else if (imageLayerManager.managedUserLayer) {
+              imageLayerManager.managedUserLayer.visible = isVisible;
+            }
+            /** 设置透明度 */
+            if (isVisible) {
+              imageLayerManager.changeOpacity(renderOpacity);
+            }
+            console.log('✅ Tissue（底图）已更新 - 可见:', isVisible, '透明度:', renderOpacity);
+          } else {
+            console.warn('⚠️ 图像图层管理器未初始化');
           }
-          Plotly.relayout(domId, relayoutObj);
           break;
+
+        case 'cellSeg':
+          /** 控制 CellSeg（轮廓）图层 - 完全独立 */
+          if (cellSegLayerManager) {
+            /** 设置可见性 */
+            updateCellSegLayerVisibility();
+            /** 设置透明度 */
+            if (isVisible) {
+              cellSegLayerManager.changeOpacity(renderOpacity);
+            }
+            console.log('✅ CellSeg（轮廓）已更新 - 可见:', isVisible, '透明度:', renderOpacity);
+          } else {
+            console.warn('⚠️ CellSeg 图层管理器未初始化');
+          }
+          break;
+
         case 'cluster':
-          Plotly.restyle(domId, {
-            'marker.opacity': renderOpacity * renderOpacity,
-          });
+          /** 控制 Cluster（填充）图层 - 完全独立 */
+          if (clusterLayerManager) {
+            /** 设置可见性 */
+            updateClusterLayerVisibility();
+            /** 设置透明度 */
+            if (isVisible) {
+              clusterLayerManager.changeOpacity(renderOpacity);
+            }
+            console.log('✅ Cluster（填充）已更新 - 可见:', isVisible, '透明度:', renderOpacity);
+          } else {
+            console.warn('⚠️ Cluster 图层管理器未初始化');
+          }
           break;
       }
     };
@@ -377,23 +495,86 @@ const CellClusterByNG = {
           /* 添加图像图层 */
           updateStatus('正在添加图像图层...');
           if (props.data.ngImageOptions) {
-            engine.addImageLayer(props.data.ngImageOptions);
+            const imgLayerPromise = engine.addImageLayer(props.data.ngImageOptions);
+            if (imgLayerPromise && imgLayerPromise.then) {
+              imgLayerPromise.then((manager) => {
+                imageLayerManager = manager;
+                console.log('✅ 图像图层管理器已保存');
+                /** 应用初始透明度 */
+                if (imageLayerManager && imageStateObj.value.tissueSeg) {
+                  const initialOpacity = imageStateObj.value.tissueSeg.show ? imageStateObj.value.tissueSeg.opacity : 0;
+                  imageLayerManager.changeOpacity(initialOpacity);
+                }
+              });
+            } else {
+              /** 同步返回的情况 */
+              imageLayerManager = imgLayerPromise;
+              console.log('✅ 图像图层管理器已保存（同步）');
+            }
           }
 
-          /** 添加cellbin图层 */
-          let cellBinClusterLayerOptions = {
-            name: 'CellBinClusterLayer',
+          /** 添加 CellSeg 图层（仅轮廓 outline） */
+          let cellSegLayerOptions = {
+            name: 'CellSegLayer',
             url: 'precomputed://memory://135_cellCluster/',
-            visible: true,
-            opacity: 1
+            visible: imageStateObj.value.cellSeg.show,
+            opacity: imageStateObj.value.cellSeg.opacity
           };
-          engine.addCellBinClusterSpatialLayer(cellBinClusterLayerOptions).then((layerManager) => {
+          engine.addCellBinClusterSpatialLayer(cellSegLayerOptions).then((layerManager) => {
+            cellSegLayerManager = layerManager;
+            console.log('✅ CellSeg（轮廓）图层管理器已保存');
+            console.log('📋 CellSeg 图层管理器可用方法:', Object.keys(layerManager));
+
+            /** 设置为仅轮廓模式 */
+            if (layerManager.changeFillStrokeMode) {
+              layerManager.changeFillStrokeMode('outline');
+              console.log('✅ CellSeg 图层设置为 outline 模式');
+            }
+
+            /** 设置轮廓颜色（可以使用统一的颜色或聚类颜色） */
             for (let i = 0; i < props.data.ngColorRgb.length; i++) {
               layerManager.setClusterColor(
                 i + 1,
                 [props.data.ngColorRgb[i][0], props.data.ngColorRgb[i][1], props.data.ngColorRgb[i][2]]
               );
             }
+
+            /** 应用初始透明度 */
+            const initialCellSegOpacity = imageStateObj.value.cellSeg.opacity;
+            layerManager.changeOpacity(initialCellSegOpacity);
+            console.log('✅ CellSeg 图层初始化完成 - 透明度:', initialCellSegOpacity);
+          });
+
+          /** 添加 Cluster 图层（仅填充 fill） */
+          let clusterLayerOptions = {
+            name: 'ClusterLayer',
+            url: 'precomputed://memory://135_cellCluster/',
+            visible: imageStateObj.value.cluster.show,
+            opacity: imageStateObj.value.cluster.opacity
+          };
+          engine.addCellBinClusterSpatialLayer(clusterLayerOptions).then((layerManager) => {
+            clusterLayerManager = layerManager;
+            console.log('✅ Cluster（填充）图层管理器已保存');
+            console.log('📋 Cluster 图层管理器可用方法:', Object.keys(layerManager));
+
+            /** 设置为仅填充模式 */
+            if (layerManager.changeFillStrokeMode) {
+              layerManager.changeFillStrokeMode('fill');
+              console.log('✅ Cluster 图层设置为 fill 模式');
+            }
+
+            /** 设置聚类颜色 */
+            for (let i = 0; i < props.data.ngColorRgb.length; i++) {
+              layerManager.setClusterColor(
+                i + 1,
+                [props.data.ngColorRgb[i][0], props.data.ngColorRgb[i][1], props.data.ngColorRgb[i][2]]
+              );
+            }
+
+            /** 应用初始透明度 */
+            const initialClusterOpacity = imageStateObj.value.cluster.opacity;
+            layerManager.changeOpacity(initialClusterOpacity);
+            console.log('✅ Cluster 图层初始化完成 - 透明度:', initialClusterOpacity);
           })
 
         } catch (error) {
