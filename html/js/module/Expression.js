@@ -80,13 +80,15 @@ const Expression = {
       { label: 'Blues', value: 'Blues', background: 'linear-gradient(90deg, #F7FBFF 0%, #08306B 100%)', tag: '' },
       { label: 'Binary', value: 'Binary', background: 'linear-gradient(90deg, #FFFFFF 0%, #000000 100%)', tag: '' },
     ];
-    const selectedColorScheme = ref('Viridis');
+
     const filteredColorSchemeList = computed(() => {
       const heatmapImageKeys = Object.keys(heatmapImageObj);
       return colorSchemeList.filter(item => {
         return heatmapImageKeys.includes(item.value);
       });
     });
+    const selectedColorScheme = ref(filteredColorSchemeList.value[0]?.value || colorSchemeList[0].value);
+
 
     const updateHeatmap = () => {
       const data = heatmapImageObj[selectedColorScheme.value];
@@ -117,18 +119,17 @@ const Expression = {
           currentBaseImageSrc.value = item.src.source;
         };
       });
-
       const lowerVal = newValue.toLowerCase();
-      if (lowerVal.includes('he')) {
-        selectedColorScheme.value = 'Rocket';
-      } else if (['ssdna', 'dapi'].some(t => lowerVal.includes(t))) {
+      if (['ssdna', 'dapi'].some(t => lowerVal.includes(t))) {
         selectedColorScheme.value = 'Viridis';
-      }
+      } else {
+        selectedColorScheme.value = 'Rocket';
+      };
       updateHeatmap();
-
       await nextTick();
       if (imageRef.value?.style?.opacity) imageRef.value.style.opacity = imageOpacity;
     };
+
     onMounted(() => {
       console.log(123, props);
       renderSummaryProteinExpression(containerId);
@@ -136,11 +137,11 @@ const Expression = {
         return ['ssdna', 'dapi'].includes(item.value.toLowerCase())
       });
       const lowerVal = selectedImage.value.toLowerCase();
-      if (lowerVal.includes('he')) {
-        selectedColorScheme.value = 'Rocket';
-      } else if (['ssdna', 'dapi'].some(t => lowerVal.includes(t))) {
+      if (['ssdna', 'dapi'].some(t => lowerVal.includes(t))) {
         selectedColorScheme.value = 'Viridis';
-      }
+      } else {
+        selectedColorScheme.value = 'Rocket';
+      };
       updateHeatmap();
       console.log('filteredColorSchemeList', filteredColorSchemeList.value);
     });
