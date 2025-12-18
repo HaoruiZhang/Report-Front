@@ -204,7 +204,15 @@ const MarkerTable = {
       pagingBox.appendChild(inputEle);
       inputEle.addEventListener('change', function (e) {
         const inputVal = e.target.value;
-        markerTable.page(parseInt(inputVal) - 1).draw('page');
+        const pageNum = parseInt(inputVal, 10);
+
+        // 输入 0 / 负数 / 非数字时，自动回填为当前页码（不翻页）
+        if (!Number.isFinite(pageNum) || pageNum <= 0) {
+          e.target.value = markerTable.page() + 1;
+          return;
+        }
+
+        markerTable.page(pageNum - 1).draw('page');
       });
 
       const dtPaging = tableContainer.querySelector('.dt-paging');
