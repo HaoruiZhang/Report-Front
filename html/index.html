@@ -3208,7 +3208,7 @@
 
 <script src="./js/dependencies/vue.global.prod.js"></script>
 <script>
-  const { createApp, ref, onMounted, computed, watch, nextTick } = Vue;
+  const { createApp, ref, onMounted, computed, watch, nextTick, onBeforeUnmount } = Vue;
   let message, messageArrow, markerTableMsgMap;
   function mergeObjects(obj1, obj2) {
     for (let key in obj2) {

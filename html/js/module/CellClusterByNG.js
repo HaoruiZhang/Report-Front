@@ -13,7 +13,7 @@ const CellClusterByNG = {
     const imageStateObj = ref({
       tissueSeg: { opacity: 1, show: true, indexStart: 0, length: 1 },
       cellSeg: { opacity: 1, show: true, indexStart: 1, length: 1 },
-      cluster: { opacity: 0.5, show: true, indexStart: 5, length: 1 }
+      cluster: { opacity: 1, show: true, indexStart: 5, length: 1 }
     });
     const ngStatus = ref('初始化中...');
     const ifShowExplain = ref(false);
@@ -403,6 +403,23 @@ const CellClusterByNG = {
         console.log('🛈 ' + ngStatus.value);
       };
 
+      /**
+       * 设置初始视图为全图
+       * 使用 infoData 的边界信息来计算合适的相机位置和缩放
+       */
+      function fitToView(engine, infoData) {
+        if (!engine || !infoData) {
+          console.warn('⚠️ 无法设置全图视图：引擎或 infoData 不存在');
+          return;
+        };
+
+        try {
+          engine.containAllLayers();
+        } catch (error) {
+          console.error('❌ 设置全图视图失败:', error);
+        };
+      };
+
       async function runAfterDOMloaded() {
         try {
           updateStatus('检查StereoV...');
@@ -447,6 +464,9 @@ const CellClusterByNG = {
             allMemoryData.set('135_cellCluster/info', infoData);
           };
 
+          /** 保存 infoData 以便后续使用 */
+          let savedInfoData = infoData;
+
           for (const file of props.data.ngL0Files) {
             const key = `135_cellCluster/L0/${file}`;
             const data = getMemoryData(key);
@@ -490,6 +510,7 @@ const CellClusterByNG = {
           if (!engine) {
             throw new Error('引擎创建失败，返回值为空');
           };
+          window.engine = engine;
 
 
           /* 添加图像图层 */
@@ -511,39 +532,9 @@ const CellClusterByNG = {
               imageLayerManager = imgLayerPromise;
               console.log('✅ 图像图层管理器已保存（同步）');
             }
-          }
-
-          /** 添加 CellSeg 图层（仅轮廓 outline） */
-          let cellSegLayerOptions = {
-            name: 'CellSegLayer',
-            url: 'precomputed://memory://135_cellCluster/',
-            visible: imageStateObj.value.cellSeg.show,
-            opacity: imageStateObj.value.cellSeg.opacity
           };
-          engine.addCellBinClusterSpatialLayer(cellSegLayerOptions).then((layerManager) => {
-            cellSegLayerManager = layerManager;
-            console.log('✅ CellSeg（轮廓）图层管理器已保存');
-            console.log('📋 CellSeg 图层管理器可用方法:', Object.keys(layerManager));
 
-            /** 设置为仅轮廓模式 */
-            if (layerManager.changeFillStrokeMode) {
-              layerManager.changeFillStrokeMode('outline');
-              console.log('✅ CellSeg 图层设置为 outline 模式');
-            }
 
-            /** 设置轮廓颜色（可以使用统一的颜色或聚类颜色） */
-            for (let i = 0; i < props.data.ngColorRgb.length; i++) {
-              layerManager.setClusterColor(
-                i + 1,
-                [props.data.ngColorRgb[i][0], props.data.ngColorRgb[i][1], props.data.ngColorRgb[i][2]]
-              );
-            }
-
-            /** 应用初始透明度 */
-            const initialCellSegOpacity = imageStateObj.value.cellSeg.opacity;
-            layerManager.changeOpacity(initialCellSegOpacity);
-            console.log('✅ CellSeg 图层初始化完成 - 透明度:', initialCellSegOpacity);
-          });
 
           /** 添加 Cluster 图层（仅填充 fill） */
           let clusterLayerOptions = {
@@ -561,7 +552,7 @@ const CellClusterByNG = {
             if (layerManager.changeFillStrokeMode) {
               layerManager.changeFillStrokeMode('fill');
               console.log('✅ Cluster 图层设置为 fill 模式');
-            }
+            };
 
             /** 设置聚类颜色 */
             for (let i = 0; i < props.data.ngColorRgb.length; i++) {
@@ -569,20 +560,61 @@ const CellClusterByNG = {
                 i + 1,
                 [props.data.ngColorRgb[i][0], props.data.ngColorRgb[i][1], props.data.ngColorRgb[i][2]]
               );
-            }
+            };
 
             /** 应用初始透明度 */
             const initialClusterOpacity = imageStateObj.value.cluster.opacity;
             layerManager.changeOpacity(initialClusterOpacity);
             console.log('✅ Cluster 图层初始化完成 - 透明度:', initialClusterOpacity);
-          })
+          });
+
+          /** 添加 CellSeg 图层（仅轮廓 outline） */
+          let cellSegLayerOptions = {
+            name: 'CellSegLayer',
+            url: 'precomputed://memory://135_cellCluster/',
+            visible: imageStateObj.value.cellSeg.show,
+            opacity: imageStateObj.value.cellSeg.opacity
+          };
+          engine.addCellBinClusterSpatialLayer(cellSegLayerOptions).then((layerManager) => {
+            cellSegLayerManager = layerManager;
+            console.log('✅ CellSeg（轮廓）图层管理器已保存');
+            console.log('📋 CellSeg 图层管理器可用方法:', Object.keys(layerManager));
+
+            /** 设置为仅轮廓模式 */
+            if (layerManager.changeFillStrokeMode) {
+              layerManager.changeFillStrokeMode('outline');
+              console.log('✅ CellSeg 图层设置为 outline 模式');
+            };
+
+            /** 设置轮廓颜色（可以使用统一的颜色或聚类颜色） */
+            for (let i = 0; i < props.data.ngColorRgb.length; i++) {
+              layerManager.setClusterColor(
+                i + 1,
+                [props.data.ngColorRgb[i][0], props.data.ngColorRgb[i][1], props.data.ngColorRgb[i][2]]
+              );
+            };
+
+            /** 应用初始透明度 */
+            const initialCellSegOpacity = imageStateObj.value.cellSeg.opacity;
+            layerManager.changeOpacity(initialCellSegOpacity);
+            console.log('✅ CellSeg 图层初始化完成 - 透明度:', initialCellSegOpacity);
+
+            /** 在所有图层加载完成后，设置初始视图为全图 */
+            setTimeout(() => {
+              /** 如果 savedInfoData 不存在，尝试重新获取 */
+              if (!savedInfoData && getMemoryData) {
+                savedInfoData = getMemoryData('135_cellCluster/info');
+              }
+              fitToView(engine, savedInfoData);
+            }, 500);
+          });
 
         } catch (error) {
           updateStatus('错误: ' + error.message);
           console.error('错误详情:', error);
           console.error('错误堆栈:', error.stack);
         }
-      }
+      };
       runAfterDOMloaded();
     };
     onMounted(async () => {
