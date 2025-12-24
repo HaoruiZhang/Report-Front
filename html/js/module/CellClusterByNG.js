@@ -257,7 +257,7 @@ const CellClusterByNG = {
           console.log('  📄 使用内联的 info 数据');
           const infoData = inlineData.info;
           if (setMemoryData) {
-            setMemoryData('ssDNA/info', infoData);
+            setMemoryData('baseImage/info', infoData);
             console.log('✅ info 数据已设置到内存');
           }
           console.log('  📄 info 文件信息:');
@@ -268,7 +268,7 @@ const CellClusterByNG = {
           let loadedCount = 0;
           let imageIndex = [];
 
-          for (const [scaleKey, chunks] of Object.entries(inlineData.ssDNA)) {
+          for (const [scaleKey, chunks] of Object.entries(inlineData.chunks)) {
             for (const [chunkKey, base64Data] of Object.entries(chunks)) {
               console.log(`  Chunk: ${chunkKey}`);
               console.log(`    Base64长度: ${base64Data.length}`);
@@ -278,7 +278,7 @@ const CellClusterByNG = {
                 const binaryString = atob(base64Data);
                 const bytes = Uint8Array.from(binaryString, c => c.charCodeAt(0));
 
-                const key = `ssDNA/${scaleKey}/${chunkKey}`;
+                const key = `baseImage/${scaleKey}/${chunkKey}`;
                 if (setMemoryData) {
                   setMemoryData(key, bytes);
                   imageIndex.push(`${scaleKey}/${chunkKey}`)
@@ -477,7 +477,7 @@ const CellClusterByNG = {
 
           /** 获取所有Image数据  */
           for (const imagekey of imageIndex) {
-            const key = `ssDNA/${imagekey}`;
+            const key = `baseImage/${imagekey}`;
             const data = getMemoryData(key);
             if (data) {
               allMemoryData.set(key, data);
@@ -619,12 +619,12 @@ const CellClusterByNG = {
     };
     onMounted(async () => {
       console.log('CellClusterByNG Module mounted, props: ', props);
-      formattedSeries.value = props.data.spatial.map((item, index) => {
+      formattedSeries.value = props.data.ngColorRgb.map((item, index) => {
         return {
           index: index,
-          name: item.name,
+          name: 'Cluster ' + index,
           itemStyle: {
-            color: item.marker.color,
+            color: `rgb(${item[0]*255}, ${item[1]*255}, ${item[2]*255})`,
             opacity: 0.8,
             visible: true
           }

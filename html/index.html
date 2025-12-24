@@ -268,8 +268,9 @@
               </div>
             </div>
 
-            <cell-cluster-by-n-g v-if="dataJson.cellseg" :module-title="dataJson.cellseg.title"
-              :msg="dataJson.cellseg.msg" :data="dataJson.cellseg.data"
+            <cell-cluster-by-n-g v-if="dataJson.omics.gene.cellbin.cellseg"
+              :module-title="dataJson.omics.gene.cellbin.cellseg.title" :msg="dataJson.omics.gene.cellbin.cellseg.msg"
+              :data="dataJson.omics.gene.cellbin.cellseg.data"
               :base-src="(dataJson.clusterImage && dataJson.clusterImage.src.source) ?  dataJson.clusterImage.src : dataJson.baseImageList[0].src"
               prefix="gene-cellbin">
             </cell-cluster-by-n-g>
@@ -596,7 +597,8 @@
               :msg="dataJson.ms.clusterRatio.msg" :data="dataJson.ms.clusterRatio.data">
             </cluster-ratio>
 
-            <div v-if="dataJson.ms.markers" class="module-box marker-table cellbin" style="width: 1200px;padding-bottom: 20px;">
+            <div v-if="dataJson.ms.markers" class="module-box marker-table cellbin"
+              style="width: 1200px;padding-bottom: 20px;">
               <module-header :module-title="dataJson.ms.markers.title" :msg="dataJson.ms.markers.msg.header">
               </module-header>
               <div class="module-content-box binsize-container">
@@ -606,7 +608,8 @@
               </div>
             </div>
 
-            <div  v-if="dataJson.ms.aggrMarkers" class="module-box marker-table" style="width: 1200px;padding-bottom: 20px;">
+            <div v-if="dataJson.ms.aggrMarkers" class="module-box marker-table"
+              style="width: 1200px;padding-bottom: 20px;">
               <module-header :module-title="dataJson.ms.aggrMarkers.title" :msg="dataJson.ms.aggrMarkers.msg.header">
               </module-header>
               <div class="module-content-box binsize-container">
@@ -644,8 +647,8 @@
               </div>
             </div>
 
-            <command-line v-if="dataJson.ms.commandLine" :module-title="dataJson.ms.commandLine.title" :msg="dataJson.ms.commandLine.msg"
-              :data="dataJson.ms.commandLine.data">
+            <command-line v-if="dataJson.ms.commandLine" :module-title="dataJson.ms.commandLine.title"
+              :msg="dataJson.ms.commandLine.msg" :data="dataJson.ms.commandLine.data">
             </command-line>
           </div>
 

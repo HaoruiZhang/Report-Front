@@ -120,7 +120,7 @@ const Expression = {
         };
       });
       const lowerVal = newValue.toLowerCase();
-      if (['ssdna', 'dapi'].some(t => lowerVal.includes(t))) {
+      if (['ssdna', 'dapi', '_if'].some(t => lowerVal.includes(t))) {
         selectedColorScheme.value = 'Viridis';
       } else {
         selectedColorScheme.value = 'Oranges';
@@ -134,10 +134,10 @@ const Expression = {
       console.log(123, props);
       renderSummaryProteinExpression(containerId);
       isBlackBg.value = baseImageList.some(item => {
-        return ['ssdna', 'dapi'].includes(item.value.toLowerCase())
+        return ['ssdna', 'dapi', '_if'].includes(item.value.toLowerCase())
       });
       const lowerVal = selectedImage.value.toLowerCase();
-      if (['ssdna', 'dapi'].some(t => lowerVal.includes(t))) {
+      if (['ssdna', 'dapi', '_if'].some(t => lowerVal.includes(t))) {
         selectedColorScheme.value = 'Viridis';
       } else {
         selectedColorScheme.value = 'Oranges';
