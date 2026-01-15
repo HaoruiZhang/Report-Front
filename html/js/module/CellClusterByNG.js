@@ -339,7 +339,13 @@ const CellClusterByNG = {
           let loadedCount = 0;
 
           console.log('  📦 从内联数据加载 L0 文件...');
-          for (const file of props.data.ngL0Files) {
+          /** 加载所有可用的 L0 chunks，而不仅仅是 ngL0Files 中列出的 */
+          const allL0Keys = Object.keys(inlineData.L0);
+          console.log(`  📋 发现 ${allL0Keys.length} 个 L0 chunks`);
+          console.log(`  📋 Chunk 列表: ${allL0Keys.slice(0, 20).join(', ')}${allL0Keys.length > 20 ? '...' : ''}`);
+
+          /** 始终加载所有可用的 chunks */
+          for (const file of allL0Keys) {
             try {
               /** 从内联数据中获取 base64 编码的数据 */
               const base64Data = inlineData.L0[file];
@@ -354,16 +360,18 @@ const CellClusterByNG = {
                 }
                 totalSize += bytes.byteLength;
                 loadedCount++;
-                console.log(`    ✅ ${file}: ${bytes.byteLength} 字节`);
+                if (loadedCount <= 10 || loadedCount % 10 === 0) {
+                  console.log(`    ✅ ${file}: ${bytes.byteLength} 字节`);
+                }
               } else {
-                console.log(`    - ${file}: 内联数据中未找到`);
+                console.warn(`    ⚠️ ${file}: 内联数据中未找到 base64 数据`);
               }
             } catch (error) {
               console.error(`    ❌ ${file}: 加载失败 -`, error);
             }
           }
 
-          console.log(`  ✅ L0 数据加载完成，共加载 ${loadedCount}/${props.data.ngL0Files.length} 个文件，总大小: ${totalSize} 字节`);
+          console.log(`  ✅ L0 数据加载完成，共加载 ${loadedCount}/${allL0Keys.length} 个文件，总大小: ${totalSize} 字节`);
 
         } catch (error) {
           console.error('  ❌ 加载数据失败:', error);
@@ -467,13 +475,38 @@ const CellClusterByNG = {
           /** 保存 infoData 以便后续使用 */
           let savedInfoData = infoData;
 
-          for (const file of props.data.ngL0Files) {
-            const key = `135_cellCluster/L0/${file}`;
-            const data = getMemoryData(key);
-            if (data) {
-              allMemoryData.set(key, data);
+          /** 收集所有已加载的 L0 chunks */
+          /** 从 ngRenderData.L0 获取所有可用的 chunk keys */
+          const loadedL0Chunks = new Set();
+
+          if (props.data.ngRenderData && props.data.ngRenderData.L0) {
+            const allL0Keys = Object.keys(props.data.ngRenderData.L0);
+            console.log(`  📦 正在收集 ${allL0Keys.length} 个 L0 chunks 到内存数据...`);
+
+            for (const file of allL0Keys) {
+              const key = `135_cellCluster/L0/${file}`;
+              const data = getMemoryData(key);
+              if (data) {
+                allMemoryData.set(key, data);
+                loadedL0Chunks.add(file);
+              } else {
+                console.warn(`    ⚠️ Chunk ${file} 未在内存中找到，可能未加载`);
+              }
             }
-          };
+          } else {
+            /** 如果没有 ngRenderData，尝试从 ngL0Files 加载（向后兼容）*/
+            const l0FilesToCheck = props.data.ngL0Files || [];
+            for (const file of l0FilesToCheck) {
+              const key = `135_cellCluster/L0/${file}`;
+              const data = getMemoryData(key);
+              if (data) {
+                allMemoryData.set(key, data);
+                loadedL0Chunks.add(file);
+              }
+            }
+          }
+
+          console.log(`  📦 已收集 ${loadedL0Chunks.size} 个 L0 chunks 到内存数据`);
 
           /** 获取所有Image数据  */
           for (const imagekey of imageIndex) {
@@ -516,7 +549,20 @@ const CellClusterByNG = {
           /* 添加图像图层 */
           updateStatus('正在添加图像图层...');
           if (props.data.ngImageOptions) {
-            const imgLayerPromise = engine.addImageLayer(props.data.ngImageOptions);
+            /** 过滤掉无效的属性，避免 shader UI control 错误 */
+            const imageOptions = { ...props.data.ngImageOptions };
+            /** 移除 layerReadyCallback，因为它不能是字符串，且不是有效的 neuroglancer 选项 */
+            delete imageOptions.layerReadyCallback;
+            /** 确保 normalizes 结构正确（如果需要的话） */
+            if (imageOptions.normalizes && typeof imageOptions.normalizes === 'object') {
+              /** 保持 normalizes 结构，但确保它是有效的 */
+              if (imageOptions.normalizes.range && !Array.isArray(imageOptions.normalizes.range)) {
+                console.warn('⚠️ normalizes.range 应该是数组');
+                delete imageOptions.normalizes;
+              }
+            }
+            const imgLayerPromise = engine.addImageLayer(imageOptions);
+            /* const imgLayerPromise = engine.addManyChannelLayer(imageOptions); */
             if (imgLayerPromise && imgLayerPromise.then) {
               imgLayerPromise.then((manager) => {
                 imageLayerManager = manager;
@@ -622,9 +668,9 @@ const CellClusterByNG = {
       formattedSeries.value = props.data.ngColorRgb.map((item, index) => {
         return {
           index: index,
-          name: 'Cluster ' + index,
+          name: 'Cluster ' + (index + 1),
           itemStyle: {
-            color: `rgb(${item[0]*255}, ${item[1]*255}, ${item[2]*255})`,
+            color: `rgb(${item[0] * 255}, ${item[1] * 255}, ${item[2] * 255})`,
             opacity: 0.8,
             visible: true
           }
