@@ -561,7 +561,7 @@ const CellClusterByNG = {
                 delete imageOptions.normalizes;
               }
             }
-            const imgLayerPromise = engine.addImageLayer(imageOptions);
+            const imgLayerPromise = props.data.ngImageData.info.num_channels === 1 ? engine.addImageLayer(imageOptions) : engine.addManyChannelLayer(imageOptions);
             /* const imgLayerPromise = engine.addManyChannelLayer(imageOptions); */
             if (imgLayerPromise && imgLayerPromise.then) {
               imgLayerPromise.then((manager) => {
