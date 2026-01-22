@@ -76,7 +76,7 @@ const Expression = {
     const colorSchemeList = [
       { label: 'Viridis', value: 'Viridis', background: 'linear-gradient(90deg, #440154 0%, #35B779 50%, #FDE725 100%)', tag: '' },
       { label: 'Turbo', value: 'Turbo', background: 'linear-gradient(90deg, #30123B 0%, #28BBEC 10%, #A2FC3C 25%, #F2F42B 40%, #FABA32 55%, #E85B1A 70%, #900C00 100%)', tag: '' },
-      { label: 'Oranges', value: 'Oranges', background: 'linear-gradient(90deg, #FBF4E0 0%, #E3594A 50%, #03051A 100%)', tag: '' },
+      { label: 'OrRd', value: 'OrRd', background: 'linear-gradient(90deg, #FBF4E0 0%, #E3594A 50%, #03051A 100%)', tag: '' },
       { label: 'Blues', value: 'Blues', background: 'linear-gradient(90deg, #F7FBFF 0%, #08306B 100%)', tag: '' },
       { label: 'Binary', value: 'Binary', background: 'linear-gradient(90deg, #FFFFFF 0%, #000000 100%)', tag: '' },
     ];
@@ -123,7 +123,7 @@ const Expression = {
       if (['ssdna', 'dapi', '_if'].some(t => lowerVal.includes(t))) {
         selectedColorScheme.value = 'Viridis';
       } else {
-        selectedColorScheme.value = 'Oranges';
+        selectedColorScheme.value = 'OrRd';
       };
       updateHeatmap();
       await nextTick();
@@ -140,7 +140,7 @@ const Expression = {
       if (['ssdna', 'dapi', '_if'].some(t => lowerVal.includes(t))) {
         selectedColorScheme.value = 'Viridis';
       } else {
-        selectedColorScheme.value = 'Oranges';
+        selectedColorScheme.value = 'OrRd';
       };
       updateHeatmap();
       console.log('filteredColorSchemeList', filteredColorSchemeList.value);
