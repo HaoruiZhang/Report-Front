@@ -171,11 +171,11 @@ const Microbe = {
                 labelLinePoints: [
                   params.labelLinePoints[0],
                   [
-                    params.labelLinePoints[1][0] < 282 ? 146 : 440,
+                    params.labelLinePoints[1][0] <290 ? 146 : 440,
                     params.labelLinePoints[1][1]
                   ],
                   [
-                    params.labelLinePoints[1][0] < 282 ? 32 : 548,
+                    params.labelLinePoints[1][0] < 290 ? 32 : 548,
                     params.labelLinePoints[2][1]
                   ]
                 ]

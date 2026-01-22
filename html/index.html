@@ -171,8 +171,8 @@
               :msg="dataJson.omics.gene.squarebin.statistics.msg" :data="dataJson.omics.gene.squarebin.statistics.data">
             </square-table>
 
-            <div id="geneSquarebinDistribution" class="module-box distribution-module"
-              style="width: 1200px;padding-bottom: 20px;">
+            <div v-if="dataJson.omics.gene.squarebin.distribution" id="geneSquarebinDistribution"
+              class="module-box distribution-module" style="width: 1200px;padding-bottom: 20px;">
               <module-header module-title="Square Bin Plots" :msg="dataJson.omics.gene.squarebin.distribution.msg">
               </module-header>
               <div class="module-content-box binsize-container">
@@ -198,8 +198,8 @@
 
 
 
-            <div class="module-box cluster-module" id="geneSquarebinCluster"
-              style="width: 1200px;padding-bottom: 20px;">
+            <div v-if="dataJson.omics.gene.squarebin.clustering" class="module-box cluster-module"
+              id="geneSquarebinCluster" style="width: 1200px;padding-bottom: 20px;">
               <module-header :module-title="dataJson.omics.gene.squarebin.clustering.title">
               </module-header>
               <div class="module-content-box binsize-container">
@@ -225,7 +225,8 @@
               </div>
             </div>
 
-            <div class="module-box marker-table" style="width: 1200px;padding-bottom: 20px;">
+            <div v-if="dataJson.omics.gene.squarebin.markers" class="module-box marker-table"
+              style="width: 1200px;padding-bottom: 20px;">
               <module-header module-title="Top Markers by Cluster"
                 :msg="dataJson.omics.gene.squarebin.markers.msg.header">
               </module-header>
@@ -250,8 +251,8 @@
               :module-title="dataJson.omics.gene.cellbin.statistics.title"
               :msg="dataJson.omics.gene.cellbin.statistics.msg" :data="dataJson.omics.gene.cellbin.statistics.data">
             </square-table>
-            <div id="geneCellbinDistribution" class="module-box distribution-module"
-              style="width: 1200px;padding-bottom: 20px;">
+            <div v-if="dataJson.omics.gene.cellbin.distribution" id="geneCellbinDistribution"
+              class="module-box distribution-module" style="width: 1200px;padding-bottom: 20px;">
               <module-header module-title="Cell Bin Plots" :msg="dataJson.omics.gene.cellbin.distribution.msg">
               </module-header>
               <div class="module-content-box withPaddingTop">
@@ -292,7 +293,8 @@
             </cell-cluster-by-point> -->
 
 
-            <div class="module-box cluster-module" id="geneCellbinCluster" style="width: 1200px;padding-bottom: 20px;">
+            <div v-if="dataJson.omics.gene.cellbin.clustering" class="module-box cluster-module" id="geneCellbinCluster"
+              style="width: 1200px;padding-bottom: 20px;">
               <module-header :module-title="dataJson.omics.gene.cellbin.clustering.title">
               </module-header>
               <div class="module-content-box withPaddingTop">
@@ -315,7 +317,8 @@
 
 
 
-            <div class="module-box marker-table cellbin" style="width: 1200px;padding-bottom: 20px;">
+            <div v-if="dataJson.omics.gene.cellbin.markers" class="module-box marker-table cellbin"
+              style="width: 1200px;padding-bottom: 20px;">
               <module-header module-title="Top Markers by Cluster"
                 :msg="dataJson.omics.gene.cellbin.markers.msg.header">
               </module-header>
@@ -349,7 +352,8 @@
             </key-metrics>
 
             <div style="margin-right: 24px;">
-              <common :module-title="dataJson.omics.protein.summary.sequencing.title"
+              <common v-if="dataJson.omics.protein.summary.sequencing"
+                :module-title="dataJson.omics.protein.summary.sequencing.title"
                 :msg="dataJson.omics.protein.summary.sequencing.msg"
                 :data="dataJson.omics.protein.summary.sequencing.data">
               </common>
@@ -400,8 +404,8 @@
               :data="dataJson.omics.protein.squarebin.statistics.data">
             </square-table>
 
-            <div id="proteinSquarebinDistribution" class="module-box distribution-module"
-              style="width: 1200px;padding-bottom: 20px;">
+            <div v-if="dataJson.omics.protein.squarebin.distribution" id="proteinSquarebinDistribution"
+              class="module-box distribution-module" style="width: 1200px;padding-bottom: 20px;">
               <module-header module-title="Square Bin Plots" :msg="dataJson.omics.protein.squarebin.distribution.msg">
               </module-header>
               <div class="module-content-box binsize-container">
@@ -425,8 +429,8 @@
               </div>
             </div>
 
-            <div class="module-box cluster-module" id="proteinSquareBinCluster"
-              style="width: 1200px;padding-bottom: 20px;">
+            <div v-if="dataJson.omics.protein.squarebin.clustering" class="module-box cluster-module"
+              id="proteinSquareBinCluster" style="width: 1200px;padding-bottom: 20px;">
               <module-header :module-title="dataJson.omics.protein.squarebin.clustering.title">
               </module-header>
               <div class="module-content-box binsize-container">
@@ -463,8 +467,8 @@
               :msg="dataJson.omics.protein.cellbin.statistics.msg"
               :data="dataJson.omics.protein.cellbin.statistics.data">
             </square-table>
-            <div id="proteinCellBinDistribution" class="module-box distribution-module"
-              style="width: 1200px;padding-bottom: 20px;">
+            <div v-if="dataJson.omics.protein.cellbin.distribution" id="proteinCellBinDistribution"
+              class="module-box distribution-module" style="width: 1200px;padding-bottom: 20px;">
               <module-header module-title="Cell Bin Plots" :msg="dataJson.omics.protein.cellbin.distribution.msg">
               </module-header>
               <div class="module-content-box withPaddingTop">
@@ -481,8 +485,8 @@
               </div>
             </div>
 
-            <div class="module-box cluster-module" id="proteinCellBinCluster"
-              style="width: 1200px;padding-bottom: 20px;">
+            <div v-if="dataJson.omics.protein.cellbin.clustering" class="module-box cluster-module"
+              id="proteinCellBinCluster" style="width: 1200px;padding-bottom: 20px;">
               <module-header :module-title="dataJson.omics.protein.cellbin.clustering.title">
               </module-header>
               <div class="module-content-box withPaddingTop">
