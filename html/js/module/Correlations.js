@@ -141,7 +141,7 @@ const Correlations = {
           itemWidth: 16,
           itemHeight: 307,
           orient: 'vertical',
-          right: '0',
+          right: '4',
           bottom: '70px',
           align: 'left',
           inRange: {
