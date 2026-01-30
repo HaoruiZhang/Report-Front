@@ -221,7 +221,7 @@ const Counts = {
     };
 
     function downloadEPlot() {
-      const elementToDownload = document.getElementById('proteinCounts');
+      const elementToDownload = document.getElementById('ProteinCounts');
       html2canvas(elementToDownload, {
         scale: 2
       }).then(function (canvas) {
@@ -305,7 +305,7 @@ const Counts = {
     };
   },
   template: `
-  <div class="module-box Counts-box" style="width: 1200px;padding-bottom: 20px">
+  <div id="ProteinCounts" class="module-box Counts-box" style="width: 1200px;padding-bottom: 20px">
     <div class="module-title-box">
       <div class="title-box-left">
          <span class="title-label">{{ props.moduleTitle }}</span>
