@@ -311,7 +311,7 @@ line-height: 18px;">
     async function downloadEPlot() {
       const zip = new JSZip();
        
-      const mainPlot = document.getElementById('histogram_of_protein_counts');
+      const mainPlot = document.getElementById('ClusterRatio');
       const mainCanvas = await html2canvas(mainPlot, {
         allowTaint: true,
         useCORS: true
