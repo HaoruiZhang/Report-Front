@@ -149,7 +149,7 @@ const BatchCorrection = {
           </el-icon>
         </div>
       </div>
-      <div class="cluster-area" >
+      <div class="cluster-area" style="width:100%">
         <div style="width:1046px;display: flex;justify-content: space-between;align-items: center;">
           <template v-for="(item, index) in props.data">
             <div :style="(props.data.length===1? 'width:1160px;' : 'width:507px;') + 'border-radius: 5px;'">
@@ -170,7 +170,7 @@ const BatchCorrection = {
           </template>
         </div>
         <div style="height: 470px; overflow:auto; overscroll-behavior:contain">
-          <div id="batchCorrection_legendBox" style="padding-left: 12px;">
+          <div id="batchCorrection_legendBox" style="padding-left: 12px;width:102px">
             <template v-for="(item, index) in formattedSeries">
               <div class="legend-item" @dblclick.stop.prevent="toggleDblClick(item)" @click.stop.prevent="toggleClick(item)" 
               :style="'width: 100%;height: 26px;display:flex;align-items:center;justify-content: flex-start;opacity:'+ item.itemStyle.opacity + ';cursor: pointer;'">

@@ -1954,7 +1954,7 @@
         width: 368px;
         height: 100%;
         background: var(--Light-B8-, #F4F5F6);
-        padding: 20px;
+        padding: 24px 20px 12px;
         box-sizing: border-box;
         border-radius: 4px;
         color: rgba(69, 83, 122, 1);
@@ -2831,6 +2831,16 @@
 
     .gray-text {
       color: rgb(202, 202, 202);
+    }
+
+    /* Frozen columns separator shadow */
+    .dt-scroll-head thead tr:first-child th:first-child,
+    .dt-scroll-head thead tr:nth-child(2) th:nth-child(2) {
+      box-shadow: 4px 0 6px -2px rgba(0, 0, 0, 0.1);
+    }
+
+    .dt-scroll-body tbody tr td:nth-child(2) {
+      box-shadow: 4px 0 6px -2px rgba(0, 0, 0, 0.1);
     }
   }
 

@@ -24,6 +24,66 @@ const MarkerTable = {
       const childrenArr = Array.from(element.parentElement.children);
       return childrenArr.indexOf(element) < childrenArr.length / 2 ? 'left' : 'right';
     };
+    function applyFixedColumns(tableContainer) {
+      const scrollHead = tableContainer.querySelector('.dt-scroll-head');
+      const scrollBody = tableContainer.querySelector('.dt-scroll-body');
+      if (!scrollHead || !scrollBody) return;
+
+      // Get the first column width from the body
+      const firstBodyTd = scrollBody.querySelector('tbody tr td:first-child');
+      if (!firstBodyTd) return;
+      const firstColWidth = firstBodyTd.offsetWidth;
+
+      // --- Header table (in dt-scroll-head) ---
+      const headRows = scrollHead.querySelectorAll('thead tr');
+
+      // First header row - "Marker" (colspan=2)
+      if (headRows[0]) {
+        const th = headRows[0].querySelector('th:first-child');
+        if (th) {
+          th.style.position = 'sticky';
+          th.style.left = '0';
+          th.style.zIndex = '3';
+          th.style.backgroundColor = '#DEE3ED';
+        }
+      }
+
+      // Second header row - "ID" and "Name"
+      if (headRows[1]) {
+        const ths = headRows[1].querySelectorAll('th');
+        if (ths[0]) {
+          ths[0].style.position = 'sticky';
+          ths[0].style.left = '0';
+          ths[0].style.zIndex = '3';
+          ths[0].style.backgroundColor = '#F7F7F7';
+        }
+        if (ths[1]) {
+          ths[1].style.position = 'sticky';
+          ths[1].style.left = firstColWidth + 'px';
+          ths[1].style.zIndex = '3';
+          ths[1].style.backgroundColor = '#F7F7F7';
+        }
+      }
+
+      // --- Body table (in dt-scroll-body) ---
+      const bodyRows = scrollBody.querySelectorAll('tbody tr');
+      bodyRows.forEach((row) => {
+        const cells = row.querySelectorAll('td');
+        if (cells[0]) {
+          cells[0].style.position = 'sticky';
+          cells[0].style.left = '0';
+          cells[0].style.zIndex = '1';
+          cells[0].style.backgroundColor = '#fff';
+        }
+        if (cells[1]) {
+          cells[1].style.position = 'sticky';
+          cells[1].style.left = firstColWidth + 'px';
+          cells[1].style.zIndex = '1';
+          cells[1].style.backgroundColor = '#fff';
+        }
+      });
+    };
+
     function reStyle(tableContainer, curTable) {
       var rows = tableContainer.getElementsByTagName("tr");
       for (var i = 2; i < rows.length; i++) {
@@ -190,9 +250,11 @@ const MarkerTable = {
       const tableContainer = document.getElementById(tableContainerId.value);
       markerTable.on('draw.dt', function () {
         reStyle(tableContainer, markerTable);
+        applyFixedColumns(tableContainer);
       });
       await nextTick();
       reStyle(tableContainer, markerTable);
+      applyFixedColumns(tableContainer);
 
       const pagingBox = document.createElement('div');
       const spanEle = document.createElement('span');

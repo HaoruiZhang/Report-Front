@@ -65,7 +65,7 @@ const ClusterRatio = {
 
     async function plotRatio(plotSeries) {
       await nextTick();
-      const legendWidth = parseInt(getComputedStyle(document.getElementById('clusterRatio_legendBox')).getPropertyValue('width').split('px')[0]) + 16;
+      const legendWidth = parseInt(getComputedStyle(document.getElementById('clusterRatio_legendBox')).getPropertyValue('width').split('px')[0]) + 24;
       const option = {
         dataZoom: sliceList.length > 16 ? [
           {
@@ -382,15 +382,15 @@ line-height: 18px;">
       </div>
     </div>
 
-    <div class="module-content-box" style="padding-top: 52px;display: flex;justify-content: space-evenly;">
+    <div class="module-content-box" style="padding-top: 44px;display: flex;justify-content: space-evenly;">
       <div id="histogram_of_protein_counts" style="position:relative;height: 400px;width: 1160px;"></div>
-      <div style="max-width: 120px;height: 380px;position: absolute;right: 0;top: 52px;overflow:auto;overscroll-behavior:contain" >
-        <div id="clusterRatio_legendBox" style="padding-left: 12px;">
+      <div style="width: 94px;height: 380px;position: absolute;right: 0;top: 52px;overflow:auto;overscroll-behavior:contain" >
+        <div id="clusterRatio_legendBox">
           <template v-for="(item, index) in formattedSeries">
             <div class="legend-item" @dblclick.stop.prevent="toggleDblClick(item)" @click.stop.prevent="toggleClick(item)" 
-            :style="'width: 100%;height: 20px;display:flex;align-items:center;justify-content: flex-start;opacity:'+ (selectedNameList.includes(item.name) ? 1 : 0.4)">
+            :style="'width: 100%;height: 14px;display:flex;margin-bottom:12px;align-items:center;justify-content: flex-start;opacity:'+ (selectedNameList.includes(item.name) ? 1 : 0.4)">
               <div :style="'width: 12px;height:12px;border-radius:50%;background-color:'+ item.itemStyle.color"></div>
-              <span style="font-size: 12px;line-height:20px;margin-left: 8px;max-width:109px;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;">{{item.name}}</span>
+              <span style="font-size: 14px;line-height:14px;margin-left: 8px;max-width:109px;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;">{{item.name}}</span>
             </div>
           </template>
         </div>
