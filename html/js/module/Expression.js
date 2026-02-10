@@ -210,8 +210,8 @@ const Expression = {
               </el-tooltip>
 
               <div :id="containerId" style="position: relative;width: 100%;height: 100%; " :class="{'blackBackground': isBlackBg}" ref="summary-gene-expression-imagebox">
-                <img v-if="currentBaseImageSrc" ref="imageRef" :src="currentBaseImageSrc" style="width: auto;height: 100%;position:absolute;opacity: 0.2;object-fit: contain;top:50%;left:50%;transform:translate(-50%, -50%);">
-                <img v-if="currentHeatmapImageSrc" ref="heatmapImageRef" :src="currentHeatmapImageSrc" style="object-fit: contain;width: auto;height: 100%;position:absolute;opacity: 0.8;top:50%;left:50%;transform:translate(-50%, -50%);">
+                <img v-if="currentBaseImageSrc" ref="imageRef" :src="currentBaseImageSrc" style="width: 100%;height: 100%;position:absolute;opacity: 0.2;object-fit: contain;top:50%;left:50%;transform:translate(-50%, -50%);">
+                <img v-if="currentHeatmapImageSrc" ref="heatmapImageRef" :src="currentHeatmapImageSrc" style="object-fit: contain;width: 100%;height: 100%;position:absolute;opacity: 0.8;top:50%;left:50%;transform:translate(-50%, -50%);">
               </div>
             </div>
           

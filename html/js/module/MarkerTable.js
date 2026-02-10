@@ -29,15 +29,12 @@ const MarkerTable = {
       const scrollBody = tableContainer.querySelector('.dt-scroll-body');
       if (!scrollHead || !scrollBody) return;
 
-      // Get the first column width from the body
       const firstBodyTd = scrollBody.querySelector('tbody tr td:first-child');
       if (!firstBodyTd) return;
       const firstColWidth = firstBodyTd.offsetWidth;
 
-      // --- Header table (in dt-scroll-head) ---
       const headRows = scrollHead.querySelectorAll('thead tr');
 
-      // First header row - "Marker" (colspan=2)
       if (headRows[0]) {
         const th = headRows[0].querySelector('th:first-child');
         if (th) {
@@ -46,9 +43,8 @@ const MarkerTable = {
           th.style.zIndex = '3';
           th.style.backgroundColor = '#DEE3ED';
         }
-      }
+      };
 
-      // Second header row - "ID" and "Name"
       if (headRows[1]) {
         const ths = headRows[1].querySelectorAll('th');
         if (ths[0]) {
@@ -63,9 +59,8 @@ const MarkerTable = {
           ths[1].style.zIndex = '3';
           ths[1].style.backgroundColor = '#F7F7F7';
         }
-      }
+      };
 
-      // --- Body table (in dt-scroll-body) ---
       const bodyRows = scrollBody.querySelectorAll('tbody tr');
       bodyRows.forEach((row) => {
         const cells = row.querySelectorAll('td');
@@ -74,7 +69,7 @@ const MarkerTable = {
           cells[0].style.left = '0';
           cells[0].style.zIndex = '1';
           cells[0].style.backgroundColor = '#fff';
-        }
+        };
         if (cells[1]) {
           cells[1].style.position = 'sticky';
           cells[1].style.left = firstColWidth + 'px';
