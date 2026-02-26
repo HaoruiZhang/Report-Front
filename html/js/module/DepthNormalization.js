@@ -13,6 +13,14 @@ const DepthNormalization = {
     const isCellbin = computed(() => {
       return props.data[0].meanCellArea > 0;
     });
+
+    const getWidth = (key) => {
+      const sliceList = props.data.map(item => String(item[key] || ''));
+      const maxLength = Math.max(...sliceList.map(item => item.length), key.length);
+      return maxLength * 10 + 40;
+    };
+    const sliceWidth = ref(getWidth('Slice'));
+    const snWidth = ref(getWidth('SN'));
     onMounted(() => {
       console.log('Mount DepthNormalization: ', props, isCellbin.value);
     });
@@ -20,6 +28,8 @@ const DepthNormalization = {
     return {
       props,
       isCellbin,
+      sliceWidth,
+      snWidth,
       ifShowExplain,
       colWidth,
       msg
@@ -34,9 +44,17 @@ const DepthNormalization = {
     </div>
 
   
-    <div class="module-content-box" style="display: flex;justify-content: space-evenly;padding-bottom:20px;">
-      <el-table :table-layout="auto" :data="props.data" stripe style="width: 100%" :header-cell-style="{'background-color': '#efefef'}">
-        <el-table-column prop="Slice" v-if="props.data[0].Slice" align="left" width="130">
+    <div class="module-content-box" style="display: flex;justify-content: space-evenly;padding-bottom:20px;overflow-x:auto;">
+      <el-table
+        :table-layout="auto"
+        :fit="false"
+        :data="props.data"
+        stripe
+        style="min-width: 100%;"
+        :header-cell-style="{'background-color': '#efefef', 'white-space': 'nowrap', 'word-break': 'normal'}"
+        :cell-style="{'white-space': 'nowrap', 'word-break': 'normal'}"
+      >
+        <el-table-column prop="Slice" v-if="props.data[0].Slice" align="left" :width="sliceWidth" >
           <template #header>
             <div class="header">
               <span class="label">
@@ -51,10 +69,13 @@ const DepthNormalization = {
               -->
             </div>
           </template>
+          <template #default="scope">
+            <div style="white-space: nowrap; word-break: keep-all;">{{ scope.row.Slice }}</div>
+          </template>
         </el-table-column>
 
          
-        <el-table-column prop="SN" v-if="props.data[0].SN" align="left" width="130">
+        <el-table-column prop="SN" v-if="props.data[0].SN" align="left" :width="snWidth">
           <template #header>
             <div class="header">
               <span class="label">
@@ -69,6 +90,9 @@ const DepthNormalization = {
               -->
             </div>
             
+          </template>
+          <template #default="scope">
+            <div style="white-space: nowrap; word-break: keep-all;">{{ scope.row.SN }}</div>
           </template>
         </el-table-column>
 

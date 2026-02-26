@@ -169,14 +169,16 @@ const BatchCorrection = {
             </div>
           </template>
         </div>
-        <div style="height: 470px; overflow:auto; overscroll-behavior:contain">
+        <div style="height: 470px; overflow-y:auto; overflow-x:hidden; overscroll-behavior:contain">
           <div id="batchCorrection_legendBox" style="padding-left: 12px;width:102px">
             <template v-for="(item, index) in formattedSeries">
-              <div class="legend-item" @dblclick.stop.prevent="toggleDblClick(item)" @click.stop.prevent="toggleClick(item)" 
-              :style="'width: 100%;height: 26px;display:flex;align-items:center;justify-content: flex-start;opacity:'+ item.itemStyle.opacity + ';cursor: pointer;'">
-                <div :style="'width: 12px;height:12px;border-radius:50%;background-color:'+ item.itemStyle.color"></div>
-                <span style="font-size: 14px;line-height:14px;margin-left: 8px; white-space:nowrap;text-overflow:ellipsis; color:#45537A">{{item.name}}</span>
-              </div>
+              <el-tooltip :content="item.name" placement="right" :show-after="300">
+                <div class="legend-item" @dblclick.stop.prevent="toggleDblClick(item)" @click.stop.prevent="toggleClick(item)" 
+                :style="'width: 100%;height: 26px;display:flex;align-items:center;justify-content: flex-start;opacity:'+ item.itemStyle.opacity + ';cursor: pointer;'">
+                  <div :style="'width: 12px;min-width:12px;height:12px;border-radius:50%;flex-shrink:0;background-color:'+ item.itemStyle.color"></div>
+                  <span style="font-size: 14px;line-height:14px;margin-left: 8px; white-space:nowrap;overflow:hidden;text-overflow:ellipsis; color:#45537A">{{item.name}}</span>
+                </div>
+              </el-tooltip>
             </template>
           </div>
         </div>
