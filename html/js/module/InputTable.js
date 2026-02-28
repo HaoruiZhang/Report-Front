@@ -14,6 +14,9 @@ const InputTable = {
     const isCellbin = computed(() => {
       return props.data[0].meanCellArea > 0;
     });
+    const customKeyWidth = computed(() => {
+      return Math.min(props.customKey.length * 10 + 40, 240);
+    });
     onMounted(() => {
       console.log('Mount InputTable: ', props, isCellbin.value);
     });
@@ -23,6 +26,7 @@ const InputTable = {
       isCellbin,
       ifShowExplain,
       colWidth,
+      customKeyWidth,
       msg
     };
   },
@@ -73,18 +77,27 @@ const InputTable = {
           </template>
         </el-table-column>
 
-        <el-table-column prop="custom" v-if="props.data[0].custom" align="left" width="160">
+        <el-table-column prop="custom" v-if="props.data[0].custom" align="left" :width="customKeyWidth">
           <template #header>
             <div class="header">
-              <span class="label">
-                {{ props.customKey }}
-              </span>
+              <el-tooltip :content="props.customKey" placement="top" :show-after="300">
+                <span class="label" style="max-width: 240px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                  {{ props.customKey }}
+                </span>
+              </el-tooltip>
               <el-tooltip offset="8" popper-class="hover-msg-box" :content="msg.custom" placement="right" :raw-content="true">
-                <div class="msg-icon-box">
+                <div class="msg-icon-box" style="flex-shrink:0;">
                   <zhrWholeAsk />
                 </div>
               </el-tooltip>
             </div>
+          </template>
+          <template #default="scope">
+            <el-tooltip :content="scope.row.custom ? String(scope.row.custom) : ''" placement="top" :show-after="300">
+              <div style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; word-break: break-all;">
+                {{ scope.row.custom }}
+              </div>
+            </el-tooltip>
           </template>
         </el-table-column>
          

@@ -106,16 +106,35 @@ const BatchCorrection = {
         }
       });
     });
-    function downloadEPlot() {
-      const elementToDownload = document.getElementById('batchCorrectionClusterArea');
-      html2canvas(elementToDownload, {
-        scale: 2
-      }).then(function (canvas) {
-        const link = document.createElement('a');
-        link.href = canvas.toDataURL('image/png');
-        link.download = props.moduleTitle + '.png';
-        link.click();
+    async function downloadEPlot() {
+      const zip = new JSZip();
+      const promises = props.data.map((item, index) => {
+        const plotId = 'plot-' + index;
+        return new Promise((resolve) => {
+          html2canvas(document.getElementById(plotId), {
+            allowTaint: true,
+            useCORS: true
+          }).then((canvas) => {
+            canvas.toBlob((blob) => {
+              zip.file(`${item.title}.png`, blob);
+              resolve();
+            }, 'image/png', 1);
+          });
+        });
       });
+      await Promise.all(promises);
+
+      const elementToDownload = document.getElementById('batchCorrection_legendBox');
+      const canvas = await html2canvas(elementToDownload, {
+        allowTaint: true,
+        useCORS: true
+      });
+      const blob = await new Promise(resolve =>
+        canvas.toBlob(resolve, 'image/png', 1)
+      );
+      zip.file(`legend.png`, blob);
+      const content = await zip.generateAsync({ type: "blob" });
+      saveAs(content, props.moduleTitle + ".zip");
     };
 
 

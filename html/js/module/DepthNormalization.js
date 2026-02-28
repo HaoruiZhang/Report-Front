@@ -73,7 +73,7 @@ const DepthNormalization = {
             <div style="white-space: nowrap; word-break: keep-all;">{{ scope.row.Slice }}</div>
           </template>
         </el-table-column>
-
+ 
          
         <el-table-column prop="SN" v-if="props.data[0].SN" align="left" :width="snWidth">
           <template #header>
