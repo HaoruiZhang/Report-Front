@@ -148,9 +148,11 @@ const MarkerTable = {
       };
 
       let geneidHeaderTemplate = "<th class='geneid-header'>ID</th> <th class='geneid-header'>Name</th>";
+      const msgKey = props.prefix.includes('aggr') ? 'aggr-l2fc' : 'l2fc';
+      const msgKey2 = props.prefix.includes('aggr') ? 'aggr-pvalue' : 'pvalue';
       for (let i = 0; i < clusterNums; i++) {
-        geneidHeaderTemplate += `<th class="geneid-header">L2FC<span onmouseenter="showMessage(event,'l2fc')" onmouseleave="hideMessage()" class="msgBtn">${svg}</span></th>
-                                 <th class="geneid-header">p-value<span onmouseenter="showMessage(event,'pvalue')"  onmouseleave="hideMessage()" class="msgBtn">${svg}</span></th>`;
+        geneidHeaderTemplate += `<th class="geneid-header">L2FC<span onmouseenter="showMessage(event,'${msgKey}')" onmouseleave="hideMessage()" class="msgBtn">${svg}</span></th>
+                                 <th class="geneid-header">p-value<span onmouseenter="showMessage(event,'${msgKey2}')"  onmouseleave="hideMessage()" class="msgBtn">${svg}</span></th>`;
       };
 
       $(`#${tableContainerId.value}`).html(`

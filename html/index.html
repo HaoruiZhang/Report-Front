@@ -2838,7 +2838,8 @@
     .dt-scroll-head thead tr:nth-child(2) th:nth-child(2) {
       box-shadow: 4px 0 6px -2px rgba(0, 0, 0, 0.1);
     }
-/*
+
+    /*
     .dt-scroll-body tbody tr td:nth-child(2) {
       box-shadow: 4px 0 6px -2px rgba(0, 0, 0, 0.1);
     }*/
@@ -3249,14 +3250,14 @@
     messageArrow.id = 'customArrow';
     document.body.appendChild(messageArrow);
   };
-  function showMessage(e, msg = 'l2fc') {
+  function showMessage(e, key = 'l2fc') {
     const windowHeight = window.innerHeight;
     const windowWidth = window.innerWidth;
     message.style.maxHeight = (windowHeight / 2 - 24) + 'px';
     message.style.maxWidth = Math.min(400, (windowWidth / 2 - 24)) + 'px';
     const { offsetLeft, offsetWidth, offsetTop, offsetHeight, pageX, pageY } = e.target;
     const { left, right, bottom, top } = e.target.getBoundingClientRect();
-    msgContent = markerTableMsgMap[msg];
+    msgContent = markerTableMsgMap[key];
     if (!msgContent) return;
     message.style.display = customArrow.style.display = 'block';
     message.innerHTML = msgContent;
@@ -3316,7 +3317,7 @@
 <script src="./js/module/Sunburst.js"></script>
 <script src="./js/module/TissueSeg.js"></script>
 <!--  End-->
-<script src="./js/result.js"></script>
+<script src="./js/result-3brains.js"></script>
 <script src='./js/dependencies/panzoom-4.5.1.min.js'></script>
 <script src="./js/dependencies/plot.min.js"></script>
 <!-- <script>
@@ -3453,7 +3454,9 @@
           markerTableMsgMap = {
             'l2fc': isOmics ? dataJson.value.omics?.gene?.squarebin?.markers?.msg?.l2fc : dataJson.value.ms.markers.msg.l2fc,
             'pvalue': isOmics ? dataJson.value.omics?.gene?.squarebin?.markers?.msg.pvalue : dataJson.value.ms.markers.msg.pvalue
-          }
+          };
+          dataJson.value.ms?.aggrMarkers?.msg?.l2fc ? markerTableMsgMap['aggr-l2fc'] = dataJson.value.ms.aggrMarkers.msg.l2fc : null;
+          dataJson.value.ms?.aggrMarkers?.msg?.pvalue ? markerTableMsgMap['aggr-pvalue'] = dataJson.value.ms.aggrMarkers.msg.pvalue : null;
         };
       });
 
