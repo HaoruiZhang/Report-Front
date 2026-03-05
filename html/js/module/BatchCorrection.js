@@ -125,10 +125,45 @@ const BatchCorrection = {
       await Promise.all(promises);
 
       const elementToDownload = document.getElementById('batchCorrection_legendBox');
+
+      const originalWidth = elementToDownload.style.width;
+      const originalMaxWidth = elementToDownload.style.maxWidth;
+      const originalOverflow = elementToDownload.style.overflow;
+
+      elementToDownload.style.width = '120px';
+      elementToDownload.style.maxWidth = 'none';
+      elementToDownload.style.overflow = 'visible';
+
+      const spans = elementToDownload.querySelectorAll('span');
+      const originalSpanStyles = [];
+      spans.forEach((span, i) => {
+        originalSpanStyles[i] = {
+          whiteSpace: span.style.whiteSpace,
+          overflow: span.style.overflow,
+          textOverflow: span.style.textOverflow
+        };
+        span.style.whiteSpace = 'normal';
+        span.style.overflow = 'visible';
+        span.style.textOverflow = 'clip';
+      });
+
       const canvas = await html2canvas(elementToDownload, {
         allowTaint: true,
-        useCORS: true
+        useCORS: true,
+        scale: 2,
+        backgroundColor: '#ffffff'
       });
+
+      elementToDownload.style.width = originalWidth;
+      elementToDownload.style.maxWidth = originalMaxWidth;
+      elementToDownload.style.overflow = originalOverflow;
+
+      spans.forEach((span, i) => {
+        span.style.whiteSpace = originalSpanStyles[i].whiteSpace;
+        span.style.overflow = originalSpanStyles[i].overflow;
+        span.style.textOverflow = originalSpanStyles[i].textOverflow;
+      });
+
       const blob = await new Promise(resolve =>
         canvas.toBlob(resolve, 'image/png', 1)
       );
@@ -189,7 +224,7 @@ const BatchCorrection = {
           </template>
         </div>
         <div style="height: 470px; overflow-y:auto; overflow-x:hidden; overscroll-behavior:contain">
-          <div id="batchCorrection_legendBox" style="padding-left: 12px;width:102px">
+          <div id="batchCorrection_legendBox" style="padding-left: 12px;padding-right: 12px;width:fit-content;width:102px">
             <template v-for="(item, index) in formattedSeries">
               <el-tooltip :content="item.name" placement="right" :show-after="300">
                 <div class="legend-item" @dblclick.stop.prevent="toggleDblClick(item)" @click.stop.prevent="toggleClick(item)" 

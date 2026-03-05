@@ -261,7 +261,7 @@ line-height: 18px;">
       myChart.setOption(option, { notMerge: true });
     };
 
-    
+
     function resetPlot() {
       plotRatio(formattedSeries.value);
       selectedNameList.value = [...rawNameList];
@@ -307,21 +307,21 @@ line-height: 18px;">
       });
       plotRatio(newSeries);
     };
- 
     async function downloadEPlot() {
       const zip = new JSZip();
        
       const mainPlot = document.getElementById('ClusterRatio');
       const mainCanvas = await html2canvas(mainPlot, {
         allowTaint: true,
-        useCORS: true
+        useCORS: true,
+        width: 1050
       });
       const mainBlob = await new Promise(resolve =>
         mainCanvas.toBlob(resolve, 'image/png', 1)
       );
       zip.file(`${props.moduleTitle}.png`, mainBlob);
 
-      const elementToDownload = document.getElementById('spatialCluster_legend');
+      const elementToDownload = document.getElementById('clusterRatio_legendBox');
       const canvas = await html2canvas(elementToDownload, {
         allowTaint: true,
         useCORS: true
@@ -338,8 +338,6 @@ line-height: 18px;">
       console.log('Mount Counts: ', props);
       var chartDom = document.getElementById('histogram_of_protein_counts');
       myChart = echarts.init(chartDom);
-
-
       series.forEach((item) => {
         formattedSeries.value.push({
           ...item,
@@ -355,8 +353,6 @@ line-height: 18px;">
         rawNameList.push(item.name);
       });
       plotRatio(formattedSeries.value);
-
-
     });
 
     return {
