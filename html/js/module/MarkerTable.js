@@ -29,11 +29,20 @@ const MarkerTable = {
       const scrollBody = tableContainer.querySelector('.dt-scroll-body');
       if (!scrollHead || !scrollBody) return;
 
-      const firstBodyTd = scrollBody.querySelector('tbody tr td:first-child');
-      if (!firstBodyTd) return;
-      const firstColWidth = firstBodyTd.offsetWidth;
-
       const headRows = scrollHead.querySelectorAll('thead tr');
+      let firstColWidth;
+
+      const firstBodyTd = scrollBody.querySelector('tbody tr td:first-child');
+      const isEmptyRow = firstBodyTd && (firstBodyTd.colSpan > 1 || firstBodyTd.classList.contains('dt-empty'));
+
+      if (firstBodyTd && !isEmptyRow) {
+        firstColWidth = firstBodyTd.offsetWidth;
+      } else if (headRows[1]) {
+        const idTh = headRows[1].querySelector('th:first-child');
+        firstColWidth = idTh ? idTh.offsetWidth : 150;
+      } else {
+        return;
+      };
 
       if (headRows[0]) {
         const th = headRows[0].querySelector('th:first-child');
@@ -64,6 +73,7 @@ const MarkerTable = {
       const bodyRows = scrollBody.querySelectorAll('tbody tr');
       bodyRows.forEach((row) => {
         const cells = row.querySelectorAll('td');
+        if (cells.length < 2) return;
         if (cells[0]) {
           cells[0].style.position = 'sticky';
           cells[0].style.left = '0';
